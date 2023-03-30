@@ -28,15 +28,9 @@ public class Tag {
     private Integer targetAgeLower; //모집 나이 하한
     private LocalDateTime createAt; // tag 생성 시간
 
-
     // 위치 정보
     private double latitude; // 위도
     private double longitude; // 경도
-
-    // Chatroom 을 관리 (1:Many)
-    // Tag 가 사라지면 관련 Chatroom 도 싹 정리
-    @OneToMany(mappedBy = "tag",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Chatroom> chatrooms = new ArrayList<>();
 
     //==기본 생성자==//
     public Tag() {}
@@ -72,15 +66,6 @@ public class Tag {
         this.host = host;
         host.setTag(this);
         host.setRole(Role.HOST);
-    }
-
-    //==
-    public void addChatRoom(Chatroom chatroom){
-        /**
-        * 추후에 limit 이용해서 채팅방 객수 조절
-         */
-
-        this.chatrooms.add(chatroom);
     }
 }
 

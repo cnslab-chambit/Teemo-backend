@@ -1,10 +1,7 @@
 package api.controller;
 
 import api.domain.Tag;
-import api.domain.dtos.CreateTagRequest;
-import api.domain.dtos.FindTagsRequest;
-import api.domain.dtos.FindTagsResponse;
-import api.domain.dtos.SearchTagResponse;
+import api.domain.dtos.*;
 import api.repository.TagRepository;
 import api.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +17,7 @@ public class TagController {
     private final TagRepository tagRepository;
     private final TagService tagService;
 
-    /**
+    /** [Host]
      * tag 생성
      */
     @PostMapping("/tag/add")
@@ -61,11 +58,20 @@ public class TagController {
         return tagService.searchTag(tagId);
     }
 
-    /**
+    /** [Guest]
      * 특정 tag 를 목적지로 설정
+     *
+     * - 조회자에게 Tag 의 위도와 경도를 제공.
+     * - Tag 에 guest 추가.
+     * - 조회자에게 Tag 등록
+     * - 조회자의 역할을 GUEST 로 바꿔야한다.
      */
+    @PostMapping("/tag/subscribe")
+    public GotoTagResponse goToTag(@RequestBody GotoTagRequest request){
+        return tagService.gotoTag(request.getTagId(), request.getMemberId());
+    }
 
-    /**
+    /** [Guest]
      * 목적지로 설정한 tag 를 포기
      */
 

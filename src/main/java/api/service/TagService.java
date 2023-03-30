@@ -4,8 +4,8 @@ import api.domain.Gender;
 import api.domain.Member;
 import api.domain.Tag;
 import api.domain.dtos.FindTagsResponse;
+import api.domain.dtos.GotoTagResponse;
 import api.domain.dtos.SearchTagResponse;
-import api.repository.ChatroomRepository;
 import api.repository.MemberRepository;
 import api.repository.TagRepository;
 import api.util.DateTimeParse;
@@ -52,9 +52,9 @@ public class TagService {
      * 3. 나이, 위도, 경도 조건에 맞는 Tag 를 취한다.
      * 4. 성별 조건을 검사(tag 의 성별조건이 조회자의 성별과 일치하거나, 'NOMATTER')하고, DTO 리스트로 변환한다.
      */
-    public List<FindTagsResponse> findTags(Long memberID, Double latitude, Double longitude){
+    public List<FindTagsResponse> findTags(Long memberId, Double latitude, Double longitude){
         // 1
-        Member member = memberRepository.find(memberID);
+        Member member = memberRepository.find(memberId);
         // 2
         Gender gender = member.getGender();
         int age = DateTimeParse.calculateAge(member.getBirthday());
@@ -70,14 +70,29 @@ public class TagService {
 
     /** 특정 Tag 정보 검색
      *
-     * 1. tagId로 tag을 찾는다.
+     * 1. tagId로 tag 을 찾는다.
      * 2. tag 의 host를 검색 후 host 정보 추출.
      * 2. tag를 DTO 로 변환 후 반환
      */
-    public SearchTagResponse searchTag(Long tagID){
-        Tag tag = tagRepository.find(tagID);
+    public SearchTagResponse searchTag(Long tagId){
+        Tag tag = tagRepository.find(tagId);
         Member host = tag.getHost();
         return new SearchTagResponse(tag,host);
+    }
+
+    /** 특정 Tag 로 목적지 설정
+     *
+     * 1. tagId로 tag 을 찾는다.
+     * 2. memberId로 조회자 정보를 가져온다.
+     *
+     */
+    public GotoTagResponse gotoTag(Long tagId, Long memberId){
+        Tag tag = tagRepository.find(tagId);
+        Member guest = memberRepository.find(memberId);
+
+
+
+        return new GotoTagResponse(tag);
     }
 
 

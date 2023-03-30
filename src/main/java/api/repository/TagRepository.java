@@ -1,8 +1,5 @@
 package api.repository;
 
-import api.domain.Chatroom;
-import api.domain.Gender;
-import api.domain.Member;
 import api.domain.Tag;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
