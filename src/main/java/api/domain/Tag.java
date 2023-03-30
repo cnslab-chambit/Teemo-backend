@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -16,8 +18,11 @@ public class Tag {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "host_id")
     private Member host;
+
+    @OneToMany(mappedBy = "tag",fetch = FetchType.LAZY)
+    private List<Member> guests = new ArrayList<>();
 
     // 모집 정보
     private String title;   // 타이틀

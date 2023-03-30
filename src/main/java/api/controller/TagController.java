@@ -79,9 +79,14 @@ public class TagController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    /**
+    /** [Host]
      * tag 삭제
      */
+    @DeleteMapping("/tags/{tag_id}")
+    public ResponseEntity deleteTag(@PathVariable("tag_id")Long tagId){
+        tagService.deleteTag(tagId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 
 
 }
