@@ -45,6 +45,8 @@ public class TagController {
 
     /**
      * tag 전체 조회
+     *
+     * tag 의 위도, 경도만 반환한다.
      */
     @GetMapping("/tags")
     public List<FindTagsResponse> findTags(@RequestBody FindTagsRequest request){
@@ -54,10 +56,10 @@ public class TagController {
     /**
      * 특정 tag 조회
      */
-//    @GetMapping("/tag/{tag_id}")
-//    public SearchTagResponse searchTag(@PathVariable("tag_id")Long tagId){
-//
-//    }
+    @GetMapping("/tag/{tag_id}")
+    public SearchTagResponse searchTag(@PathVariable("tag_id")Long tagId){
+        return tagService.searchTag(tagId);
+    }
 
     /**
      * 특정 tag 를 목적지로 설정
