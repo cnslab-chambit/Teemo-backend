@@ -1,12 +1,12 @@
 package api.controller;
 
-import api.domain.Gender;
 import api.domain.Tag;
-import api.domain.dtos.CreateTagRequestDTO;
+import api.domain.dtos.CreateTagRequest;
+import api.domain.dtos.FindTagsRequest;
+import api.domain.dtos.FindTagsResponse;
+import api.domain.dtos.SearchTagResponse;
 import api.repository.TagRepository;
 import api.service.TagService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class TagController {
      * tag 생성
      */
     @PostMapping("/tag/add")
-    public ResponseEntity createTag(@RequestBody CreateTagRequestDTO request){
+    public ResponseEntity createTag(@RequestBody CreateTagRequest request){
         // 1. 태그를 만든다.
         Tag tag = new Tag(
                 request.getTitle(),
@@ -44,21 +44,28 @@ public class TagController {
     }
 
     /**
+     * tag 전체 조회
+     */
+    @GetMapping("/tags")
+    public List<FindTagsResponse> findTags(@RequestBody FindTagsRequest request){
+        return tagService.findTags(request.getMemberID(),request.getLatitude(),request.getLongitude());
+    }
+
+    /**
      * 특정 tag 조회
      */
 //    @GetMapping("/tag/{tag_id}")
-//    public SerchTagResponseDTO searchTag(@PathVariable("tag_id")Long tagId){
-//        Tag tag = tagRepository.find(tagId);
+//    public SearchTagResponse searchTag(@PathVariable("tag_id")Long tagId){
 //
 //    }
 
     /**
-     * tag 전체 조회
+     * 특정 tag 를 목적지로 설정
      */
-//    @GetMapping("/tags")
-//    public List<FindTagResponse> findTags(){
-//
-//    }
+
+    /**
+     * 목적지로 설정한 tag 를 포기
+     */
 
     /**
      * tag 삭제

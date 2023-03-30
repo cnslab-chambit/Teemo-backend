@@ -31,8 +31,6 @@ public class ChatroomRepository {
                 .setParameter("tagId", tagId)
                 .setParameter("guestId",memberId)
                 .getResultList();
-
-
     }
 
 }

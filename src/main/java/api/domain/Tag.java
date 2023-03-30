@@ -28,6 +28,7 @@ public class Tag {
     private Integer targetAgeLower; //모집 나이 하한
     private LocalDateTime createAt; // tag 생성 시간
 
+
     // 위치 정보
     private double latitude; // 위도
     private double longitude; // 경도
@@ -52,12 +53,14 @@ public class Tag {
             double longitude
             )
     {
+
         this.title = title;
         this.detail = detail;
         this.limit = limit;
         this.targetGender = targetGender;
         this.targetAgeUpper = targetAgeUpper;
         this.targetAgeLower = targetAgeLower;
+
         this.latitude = latitude;
         this.longitude = longitude;
 
@@ -68,6 +71,7 @@ public class Tag {
     public void setHost(Member host) {
         this.host = host;
         host.setTag(this);
+        host.setRole(Role.HOST);
     }
 
     //==
