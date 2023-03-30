@@ -1,10 +1,9 @@
 package api.domain.dtos;
 
-import lombok.Data;
 import lombok.Getter;
 
 @Getter
-public class GotoTagRequest {
+public class SubscribeTagRequest {
     private Long tagId;
     private Long memberId;
 }

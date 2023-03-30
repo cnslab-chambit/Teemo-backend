@@ -66,14 +66,17 @@ public class TagController {
      * - 조회자의 역할을 GUEST 로 바꿔야한다.
      */
     @PostMapping("/tag/subscribe")
-    public GotoTagResponse goToTag(@RequestBody GotoTagRequest request){
-        return tagService.gotoTag(request.getTagId(), request.getMemberId());
+    public SubscribeTagResponse subscribeTag(@RequestBody SubscribeTagRequest request){
+        return tagService.subscribeTag(request.getTagId(), request.getMemberId());
     }
 
     /** [Guest]
      * 목적지로 설정한 tag 를 포기
      */
+    @PostMapping("/tag/unsubscribe")
+    public UnsubscribeTagResponse unsubscribeTag(@RequestBody UnsubscribeTagRequest request){
 
+    }
 
     /**
      * tag 삭제

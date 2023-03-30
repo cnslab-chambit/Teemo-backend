@@ -5,7 +5,7 @@ import api.domain.Member;
 import api.domain.Role;
 import api.domain.Tag;
 import api.domain.dtos.FindTagsResponse;
-import api.domain.dtos.GotoTagResponse;
+import api.domain.dtos.SubscribeTagResponse;
 import api.domain.dtos.SearchTagResponse;
 import api.repository.MemberRepository;
 import api.repository.TagRepository;
@@ -89,7 +89,7 @@ public class TagService {
      * 5. Tag 의 위도 경도 반환
      */
     @Transactional
-    public GotoTagResponse gotoTag(Long tagId, Long memberId){
+    public SubscribeTagResponse subscribeTag(Long tagId, Long memberId){
         // 1
         Tag tag = tagRepository.find(tagId);
         // 2
@@ -99,7 +99,7 @@ public class TagService {
         // 4
         guest.setRole(Role.GUEST);
         // 5
-        return new GotoTagResponse(tag);
+        return new SubscribeTagResponse(tag);
     }
 
 
