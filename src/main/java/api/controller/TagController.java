@@ -62,8 +62,7 @@ public class TagController {
      * 특정 tag 를 목적지로 설정
      *
      * - 조회자에게 Tag 의 위도와 경도를 제공.
-     * - Tag 에 guest 추가.
-     * - 조회자에게 Tag 등록
+     * - 조회자 멤버변수에 Tag 등록
      * - 조회자의 역할을 GUEST 로 바꿔야한다.
      */
     @PostMapping("/tag/subscribe")
@@ -74,6 +73,7 @@ public class TagController {
     /** [Guest]
      * 목적지로 설정한 tag 를 포기
      */
+
 
     /**
      * tag 삭제

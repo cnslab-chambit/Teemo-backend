@@ -2,6 +2,7 @@ package api.service;
 
 import api.domain.Gender;
 import api.domain.Member;
+import api.domain.Role;
 import api.domain.Tag;
 import api.domain.dtos.FindTagsResponse;
 import api.domain.dtos.GotoTagResponse;
@@ -22,7 +23,6 @@ import java.util.List;
 public class TagService {
 
     private final TagRepository tagRepository;
-    private final ChatroomRepository chatroomRepository;
     private final MemberRepository memberRepository;
 
     /** 태그 업로드
@@ -48,8 +48,8 @@ public class TagService {
     /** 내 근처 태그들 찾기
      *
      * 1. memberID로 회원을 찾는다.
-     * 2. 회원의 성별, 나이를 조사한다.
-     * 3. 나이, 위도, 경도 조건에 맞는 Tag 를 취한다.
+     * 2. 회원의 성별, 나이를 찾는다.
+     * 3. 나이, 위도, 경도 조건에 맞는 Tag 를 찾는다.
      * 4. 성별 조건을 검사(tag 의 성별조건이 조회자의 성별과 일치하거나, 'NOMATTER')하고, DTO 리스트로 변환한다.
      */
     public List<FindTagsResponse> findTags(Long memberId, Double latitude, Double longitude){
@@ -71,8 +71,8 @@ public class TagService {
     /** 특정 Tag 정보 검색
      *
      * 1. tagId로 tag 을 찾는다.
-     * 2. tag 의 host를 검색 후 host 정보 추출.
-     * 2. tag를 DTO 로 변환 후 반환
+     * 2. tag 의 host 를 검색 후 host 정보 추출.
+     * 3. tag 를 DTO 로 변환 후 반환
      */
     public SearchTagResponse searchTag(Long tagId){
         Tag tag = tagRepository.find(tagId);
@@ -84,14 +84,21 @@ public class TagService {
      *
      * 1. tagId로 tag 을 찾는다.
      * 2. memberId로 조회자 정보를 가져온다.
-     *
+     * 3. 조회자 멤버변수에 Tag 등록
+     * 4. 조회자의 역할을 GUEST 로 바꾼다.
+     * 5. Tag 의 위도 경도 반환
      */
+    @Transactional
     public GotoTagResponse gotoTag(Long tagId, Long memberId){
+        // 1
         Tag tag = tagRepository.find(tagId);
+        // 2
         Member guest = memberRepository.find(memberId);
-
-
-
+        // 3
+        guest.setTag(tag);
+        // 4
+        guest.setRole(Role.GUEST);
+        // 5
         return new GotoTagResponse(tag);
     }
 

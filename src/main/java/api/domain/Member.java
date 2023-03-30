@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,6 +27,9 @@ public class Member {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Chatroom> chatrooms = new ArrayList<>();
 
     //==기본 생성자==//
     public Member(){}
