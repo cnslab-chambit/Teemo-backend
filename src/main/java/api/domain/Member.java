@@ -28,8 +28,21 @@ public class Member {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Chatroom> chatrooms = new ArrayList<>();
+
+    // Host로서의 Chatroom
+    @OneToMany(mappedBy = "host", cascade = CascadeType.REMOVE)
+    private List<Chatroom> hostedChatrooms = new ArrayList<>();
+
+    // Guest로서의 Chatroom
+    @OneToOne(mappedBy = "guest", cascade = CascadeType.REMOVE)
+    private Chatroom guestChatroom;
+
+
+
+
+
+
+
 
     //==기본 생성자==//
     public Member(){}
@@ -46,5 +59,9 @@ public class Member {
 
     public void setRole(Role role){
         this.role = role;
+    }
+
+    public void setGuestChatroom(Chatroom guestChatroom) {
+        this.guestChatroom = guestChatroom;
     }
 }

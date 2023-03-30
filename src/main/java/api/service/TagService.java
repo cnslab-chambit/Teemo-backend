@@ -1,12 +1,10 @@
 package api.service;
 
-import api.domain.Gender;
-import api.domain.Member;
-import api.domain.Role;
-import api.domain.Tag;
+import api.domain.*;
 import api.domain.dtos.FindTagsResponse;
 import api.domain.dtos.SubscribeTagResponse;
 import api.domain.dtos.SearchTagResponse;
+import api.repository.ChatroomRepository;
 import api.repository.MemberRepository;
 import api.repository.TagRepository;
 import api.util.DateTimeParse;
@@ -24,6 +22,7 @@ public class TagService {
 
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
+    private final ChatroomRepository chatroomRepository;
 
     /** 태그 업로드
      *
@@ -100,6 +99,52 @@ public class TagService {
         guest.setRole(Role.GUEST);
         // 5
         return new SubscribeTagResponse(tag);
+    }
+
+    /** 목적지 설정된거 취소
+     *
+     * 1. tagId로 tag 을 찾는다.
+     * 2. memberId로 조회자 정보를 찾는다.
+     * 3. 조회자 멤버변수에 Tag 등록 해제
+     * 4. 조회자의 역할을 VIEWER 로 바꾼다.
+     * 5. 만약 host 와의 Chatroom 이 있다면, 해당 Chatroom 을 삭제해준다.
+     *      5-1. guest 의 Chatroom 정보를 가져온다.
+     *      5-2. tag 를 통해 host 정보를 가져온다.
+     *      5-3. host 의 HostChatroom List 에 접근하여 해당 Chatroom 정보를 제거한다.
+     *      5-4. guest 의 GuestChatroom 에서 해당 Chatroom 정보를 제거한다.
+     *      5-5. chatroom 에도 저장된 host, guest 매핑관계를 제거한다.
+     *      5-6. chatroom 을 제거한다.
+     */
+    @Transactional
+    public void unsubscribeTag(Long tagId, Long memberId){
+        // 1
+        Tag tag = tagRepository.find(tagId);
+        // 2
+        Member guest = memberRepository.find(memberId);
+        // 3
+        guest.setTag(null);
+        // 4
+        guest.setRole(Role.VIEWER);
+        // 5
+        if(guest.getGuestChatroom() != null){
+            // 5-1
+            Chatroom chatroom = guest.getGuestChatroom();
+            // 5-2
+            Member host = tag.getHost();
+
+
+            if (chatroom != null) {
+                // 5-3
+                host.getHostedChatrooms().remove(chatroom);
+                // 5-4
+                guest.setGuestChatroom(null);
+                // 5-5
+                chatroom.setHost(null);
+                chatroom.setGuest(null);
+                // 5-6
+                chatroomRepository.delete(chatroom);
+            }
+        }
     }
 
 

@@ -74,8 +74,9 @@ public class TagController {
      * 목적지로 설정한 tag 를 포기
      */
     @PostMapping("/tag/unsubscribe")
-    public UnsubscribeTagResponse unsubscribeTag(@RequestBody UnsubscribeTagRequest request){
-
+    public ResponseEntity unsubscribeTag(@RequestBody SubscribeTagRequest request){
+        tagService.unsubscribeTag(request.getTagId(), request.getMemberId());
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     /**
