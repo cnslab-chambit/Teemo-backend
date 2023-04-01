@@ -1,8 +1,10 @@
 package api.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,12 +16,18 @@ public class Member {
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
-    
     // 회원 정보
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+    @Column(name = "password", nullable = false)
+    @NotNull
+    private String password;
+    @Column(name = "password")
     private String nickname;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;    // 생년월일 (만 나이를 구하기 위해서)
     @Enumerated(EnumType.STRING)
     private Role role;  // 역할, ENUM [HOST,GUEST,NOTHING]
-    private LocalDate birthday;    // 생년월일 (만 나이를 구하기 위해서)
     @Enumerated(EnumType.STRING)
     private Gender gender; // 성별, ENUM [MAN(남자),WOMAN(여자)]
 
@@ -28,29 +36,32 @@ public class Member {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-
-    // Host로서의 Chatroom
+    // Host 로서의 Chatroom
     @OneToMany(mappedBy = "host", cascade = CascadeType.REMOVE)
     private List<Chatroom> hostedChatrooms = new ArrayList<>();
 
-    // Guest로서의 Chatroom
+    // Guest 로서의 Chatroom
     @OneToOne(mappedBy = "guest", cascade = CascadeType.REMOVE)
     private Chatroom guestChatroom;
-
-
-
-
-
-
 
 
     //==기본 생성자==//
     public Member(){}
 
     //==개인 정보를 담는 생성자==//
-    public Member(String nickname,Role role) {
+    public Member(String email,
+                  String password,
+                  String nickname,
+                  LocalDate birthday,
+                  Role role,
+                  Gender gender)
+    {
+        this.email = email;
+        this.password = password;
         this.nickname = nickname;
+        this.birthday = birthday;
         this.role = role;
+        this.gender = gender;
     }
 
     public void setTag(Tag tag){
