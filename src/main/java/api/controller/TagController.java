@@ -18,9 +18,9 @@ public class TagController {
     private final TagService tagService;
 
     /** [Host]
-     * tag 생성
+     * 태그 생성
      */
-    @PostMapping("/tag/add")
+    @PostMapping("/tags")
     public ResponseEntity createTag(@RequestBody CreateTagRequest request){
         // 1. 태그를 만든다.
         Tag tag = new Tag(
@@ -53,8 +53,9 @@ public class TagController {
     /**
      * 특정 tag 조회
      */
-    @GetMapping("/tag/{tag_id}")
-    public SearchTagResponse searchTag(@PathVariable("tag_id")Long tagId){
+    @GetMapping("/tags/{tag_id}")
+    public SearchTagResponse searchTag(@PathVariable("tag_id")Long tagId)
+    {
         return tagService.searchTag(tagId);
     }
 
@@ -65,17 +66,23 @@ public class TagController {
      * - 조회자 멤버변수에 Tag 등록
      * - 조회자의 역할을 GUEST 로 바꿔야한다.
      */
-    @PostMapping("/tag/subscribe")
-    public SubscribeTagResponse subscribeTag(@RequestBody SubscribeTagRequest request){
-        return tagService.subscribeTag(request.getTagId(), request.getMemberId());
+    @PostMapping("/tags/{tag_id}/subscribe")
+    public SubscribeTagResponse subscribeTag(
+            @PathVariable("tag_id")Long tagId,
+            Long member_id )
+    {
+        return tagService.subscribeTag(tagId, member_id);
     }
 
     /** [Guest]
      * 목적지로 설정한 tag 를 포기
      */
-    @PostMapping("/tag/unsubscribe")
-    public ResponseEntity unsubscribeTag(@RequestBody SubscribeTagRequest request){
-        tagService.unsubscribeTag(request.getTagId(), request.getMemberId());
+    @PostMapping("/tags/{tag_id}/unsubscribe")
+    public ResponseEntity unsubscribeTag(
+            @PathVariable("tag_id")Long tagId,
+            Long member_id )
+    {
+        tagService.unsubscribeTag(tagId,member_id);
         return new ResponseEntity(HttpStatus.OK);
     }
 

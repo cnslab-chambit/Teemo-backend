@@ -4,6 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class SubscribeTagRequest {
-    private Long tagId;
     private Long memberId;
 }
