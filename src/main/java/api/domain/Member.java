@@ -75,4 +75,14 @@ public class Member {
     public void setGuestChatroom(Chatroom guestChatroom) {
         this.guestChatroom = guestChatroom;
     }
+
+    public void setEmail(String email){
+        this.email = email;
+    }
+    public void setPassword(String Password){
+        this.password = password;
+    }
+    public void setNickname(String nickname){
+        this.nickname = nickname;
+    }
 }

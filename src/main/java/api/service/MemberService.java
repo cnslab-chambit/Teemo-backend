@@ -15,9 +15,12 @@ public class MemberService {
     public Long join(Member member){
         return memberRepository.save(member);
     }
-
     public Member findById(Long memberId){
         return memberRepository.find(memberId);
+    }
+    public void updateEmail(Long memberId,String email){
+        Member member = memberRepository.find(memberId);
+        member.setEmail(email);
     }
 
 }

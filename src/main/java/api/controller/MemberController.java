@@ -45,5 +45,13 @@ public class MemberController {
         return new FindMemberResponse(member);
     }
 
+    /**
+     * 이메일 수정
+     */
+    @PatchMapping("/members/{member_id}/email")
+    public ResponseEntity updateMemberEmail(@PathVariable("member_id")Long memberId,String email){
+        memberService.updateEmail(memberId,email);
+        return new ResponseEntity(HttpStatus.OK);
+    }
 
 }
