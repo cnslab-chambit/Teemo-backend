@@ -57,9 +57,18 @@ public class MemberController {
     /**
      * 비밀번호 수정
      */
-    @PatchMapping("/members/{member_id}/email")
+    @PatchMapping("/members/{member_id}/password")
     public ResponseEntity updateMemberPassword(@PathVariable("member_id")Long memberId,String password){
         memberService.updatePassword(memberId,password);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    /**
+     * 닉네임 수정
+     */
+    @PatchMapping("/members/{member_id}/nickname")
+    public ResponseEntity updateMemberNickname(@PathVariable("member_id")Long memberId,String nickname){
+        memberService.updateNickname(memberId,nickname);
         return new ResponseEntity(HttpStatus.OK);
     }
 

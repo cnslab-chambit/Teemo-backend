@@ -27,4 +27,9 @@ public class MemberService {
         member.setPassword(password);
     }
 
+    public void updateNickname(Long memberId, String nickname){
+        Member member = memberRepository.find(memberId);
+        member.setNickname(nickname);
+    }
+
 }
