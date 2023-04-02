@@ -22,5 +22,9 @@ public class MemberService {
         Member member = memberRepository.find(memberId);
         member.setEmail(email);
     }
+    public void updatePassword(Long memberId, String password){
+        Member member = memberRepository.find(memberId);
+        member.setPassword(password);
+    }
 
 }

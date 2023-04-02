@@ -54,4 +54,13 @@ public class MemberController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    /**
+     * 비밀번호 수정
+     */
+    @PatchMapping("/members/{member_id}/email")
+    public ResponseEntity updateMemberPassword(@PathVariable("member_id")Long memberId,String password){
+        memberService.updatePassword(memberId,password);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }
