@@ -32,4 +32,8 @@ public class MemberService {
         member.setNickname(nickname);
     }
 
+    public void removeMember(Long memberId){
+        Member member = memberRepository.find(memberId);
+        memberRepository.remove(member);
+    }
 }

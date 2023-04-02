@@ -72,4 +72,13 @@ public class MemberController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    /**
+     * 회원탈퇴
+     */
+    @DeleteMapping("/members/{member_id}")
+    public ResponseEntity removeMember(@PathVariable("member_id")Long memberId){
+        memberService.removeMember(memberId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
 }
