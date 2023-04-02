@@ -7,14 +7,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    @Transactional
     public Long join(Member member){
         return memberRepository.save(member);
     }
+    public Member findById(Long memberId){
+        return memberRepository.find(memberId);
+    }
+    public void updateEmail(Long memberId,String email){
+        Member member = memberRepository.find(memberId);
+        member.setEmail(email);
+    }
+    public void updatePassword(Long memberId, String password){
+        Member member = memberRepository.find(memberId);
+        member.setPassword(password);
+    }
 
+    public void updateNickname(Long memberId, String nickname){
+        Member member = memberRepository.find(memberId);
+        member.setNickname(nickname);
+    }
+
+    public void removeMember(Long memberId){
+        Member member = memberRepository.find(memberId);
+        memberRepository.remove(member);
+    }
 }
