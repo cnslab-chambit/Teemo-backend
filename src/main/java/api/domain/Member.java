@@ -3,8 +3,6 @@ package api.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,9 +18,8 @@ public class Member {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
     @Column(name = "password", nullable = false)
-    @NotNull
     private String password;
-    @Column(name = "password")
+    @Column(name = "nickname")
     private String nickname;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;    // 생년월일 (만 나이를 구하기 위해서)
