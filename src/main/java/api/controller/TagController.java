@@ -41,8 +41,8 @@ public class TagController {
     /**
      * 특정 tag 조회
      */
-    @GetMapping("/tags/{tag_id}")
-    public SearchTagResponse searchTag(@PathVariable("tag_id")Long tagId)
+    @GetMapping("/tags/{tagId}")
+    public SearchTagResponse searchTag(@PathVariable("tagId")Long tagId)
     {
         return tagService.searchTag(tagId);
     }
@@ -54,31 +54,31 @@ public class TagController {
      * - 조회자 멤버변수에 Tag 등록
      * - 조회자의 역할을 GUEST 로 바꿔야한다.
      */
-    @PostMapping("/tags/{tag_id}/subscribe")
+    @PostMapping("/tags/{tagId}/subscribe")
     public SubscribeTagResponse subscribeTag(
-            @PathVariable("tag_id")Long tagId,
-            Long member_id )
+            @PathVariable("tagId")Long tagId,
+            Long memberId )
     {
-        return tagService.subscribeTag(tagId, member_id);
+        return tagService.subscribeTag(tagId, memberId);
     }
 
     /** [Guest]
      * 목적지로 설정한 tag 를 포기
      */
-    @PostMapping("/tags/{tag_id}/unsubscribe")
+    @PostMapping("/tags/{tagId}/unsubscribe")
     public ResponseEntity unsubscribeTag(
-            @PathVariable("tag_id")Long tagId,
-            Long member_id )
+            @PathVariable("tagId")Long tagId,
+            Long memberId )
     {
-        tagService.unsubscribeTag(tagId,member_id);
+        tagService.unsubscribeTag(tagId,memberId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
     /** [Host]
      * tag 삭제
      */
-    @DeleteMapping("/tags/{tag_id}")
-    public ResponseEntity deleteTag(@PathVariable("tag_id")Long tagId){
+    @DeleteMapping("/tags/{tagId}")
+    public ResponseEntity deleteTag(@PathVariable("tagId")Long tagId){
         tagService.deleteTag(tagId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
