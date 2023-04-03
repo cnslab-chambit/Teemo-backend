@@ -60,11 +60,8 @@ public class Member {
         this.role = Role.VIEWER;
     }
 
-    public void setTag(Tag tag){
+    public void setTagRole(Tag tag, Role role){
         this.tag = tag;
-    }
-
-    public void setRole(Role role){
         this.role = role;
     }
 

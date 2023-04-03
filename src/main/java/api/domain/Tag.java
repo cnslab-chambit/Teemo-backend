@@ -69,8 +69,7 @@ public class Tag {
     //==연관관계 메서드==//
     public void setHost(Member host) {
         this.host = host;
-        host.setTag(this);
-        host.setRole(Role.HOST);
+        host.setTagRole(this,Role.HOST);
     }
 }
 

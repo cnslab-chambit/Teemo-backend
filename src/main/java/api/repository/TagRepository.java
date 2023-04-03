@@ -1,5 +1,6 @@
 package api.repository;
 
+import api.domain.Member;
 import api.domain.Tag;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -32,6 +33,10 @@ public class TagRepository {
                 .setParameter("latitude", latitude)
                 .setParameter("longitude", longitude)
                 .getResultList();
+    }
+
+    public void remove(Tag tag){
+        em.remove(tag);
     }
 
 
