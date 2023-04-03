@@ -25,7 +25,6 @@ public class TagController {
     @PostMapping("/tags")
     public ResponseEntity createTag(@RequestBody CreateTagRequest request){
         tagService.uploadTag(request);
-
         // 성공시, 201 상태코드 전달
         return new ResponseEntity(HttpStatus.CREATED);
     }
@@ -37,7 +36,7 @@ public class TagController {
      */
     @GetMapping("/tags")
     public List<FindTagsResponse> findTags(@RequestBody FindTagsRequest request){
-        return tagService.findTags(request.getMemberID(),request.getLatitude(),request.getLongitude());
+        return tagService.findTags(request.getMemberId(),request.getLatitude(),request.getLongitude());
     }
 
     /**
