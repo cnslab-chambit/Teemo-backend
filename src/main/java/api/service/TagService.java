@@ -1,6 +1,7 @@
 package api.service;
 
 import api.domain.*;
+import api.domain.dtos.CreateTagRequest;
 import api.domain.dtos.FindTagsResponse;
 import api.domain.dtos.SubscribeTagResponse;
 import api.domain.dtos.SearchTagResponse;
@@ -25,7 +26,7 @@ public class TagService {
     private final ChatroomRepository chatroomRepository;
 
     @Transactional
-    public Long uploadTag(Long hostId, Tag tag){
+    public Long uploadTag(CreateTagRequest request){
         /** 태그 업로드
          *
          * (Tag 는 Host 가 만들고, 채팅방은 Guest 가 만든다.)
@@ -34,11 +35,19 @@ public class TagService {
          *  2. member와 host 에 서로의 정보를 저장
          */
 
-        Member host = memberRepository.find(hostId);
-        /**
-         * host 가 있다면? setHost()
-         */
-        tag.setHost(host);
+        Member host = memberRepository.find(request.getHostId());
+        Tag tag = new Tag(
+                request.getTitle(),
+                request.getDetail(),
+                request.getMaxNum(),
+                request.getTargetGender(),
+                request.getTargetAgeUpper(),
+                request.getTargetAgeLower(),
+                request.getLatitude(),
+                request.getLongitude(),
+                host
+        );
+
         return tagRepository.save(tag);
     }
     public List<FindTagsResponse> findTags(Long memberId, Double latitude, Double longitude){

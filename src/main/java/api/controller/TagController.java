@@ -22,19 +22,7 @@ public class TagController {
      */
     @PostMapping("/tags")
     public ResponseEntity createTag(@RequestBody CreateTagRequest request){
-        // 1. 태그를 만든다.
-        Tag tag = new Tag(
-                request.getTitle(),
-                request.getDetail(),
-                request.getLimit(),
-                request.getTargetGender(),
-                request.getTargetAgeUpper(),
-                request.getTargetAgeLower(),
-                request.getLatitude(),
-                request.getLongitude()
-        );
-        // 2. 서비스 계층에 member_id와 tag 를 넘긴다.
-        tagService.uploadTag(request.getHostId(), tag);
+        tagService.uploadTag(request);
 
         // 성공시, 201 상태코드 전달
         return new ResponseEntity(HttpStatus.CREATED);

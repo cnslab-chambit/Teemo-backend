@@ -10,7 +10,7 @@ public class CreateTagRequest {
     private double longitude;
     private String title;
     private String detail;
-    private int limit;
+    private int maxNum;
     private Gender targetGender;
     private Integer targetAgeUpper = 100;
     private Integer targetAgeLower = 0;

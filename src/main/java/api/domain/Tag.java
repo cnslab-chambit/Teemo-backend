@@ -46,7 +46,8 @@ public class Tag {
             Integer targetAgeUpper,
             Integer targetAgeLower,
             double latitude,
-            double longitude
+            double longitude,
+            Member host
             )
     {
 
@@ -59,8 +60,9 @@ public class Tag {
 
         this.latitude = latitude;
         this.longitude = longitude;
-
         this.createAt = LocalDateTime.now();
+
+        setHost(host);
     }
 
     //==연관관계 메서드==//
