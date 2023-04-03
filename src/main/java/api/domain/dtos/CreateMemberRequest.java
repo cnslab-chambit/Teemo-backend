@@ -12,6 +12,5 @@ public class CreateMemberRequest {
     private String password;
     private String nickname;
     private LocalDate birthday;
-    private Role role;
     private Gender gender;
 }

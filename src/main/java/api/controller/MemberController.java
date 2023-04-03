@@ -28,7 +28,6 @@ public class MemberController {
                 request.getPassword(),
                 request.getNickname(),
                 request.getBirthday(),
-                request.getRole(),
                 request.getGender()
         );
         // 추후 중복 Email 확인

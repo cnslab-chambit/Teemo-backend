@@ -50,15 +50,14 @@ public class Member {
                   String password,
                   String nickname,
                   LocalDate birthday,
-                  Role role,
                   Gender gender)
     {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.birthday = birthday;
-        this.role = role;
         this.gender = gender;
+        this.role = Role.VIEWER;
     }
 
     public void setTag(Tag tag){

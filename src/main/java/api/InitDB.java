@@ -31,14 +31,19 @@ public class InitDB {
         private final EntityManager em;
 
         public void dbInit1() {
+            /** 호스트 전용 Data */
             Member member = new Member("test1@email.com",
-                    "0000",
+                    "pass01",
                     "nickNam1",
                     LocalDate.of(1998, 12, 25),
-                    Role.VIEWER,
                     Gender.MAN);
             em.persist(member);
 
+            /**
+             * 여성만 모집
+             * 나이 범위: 20 ~ 25
+             * 태그 생성 위치: (37.6190, 127.0597)
+             */
             Tag tag = new Tag(
                     "testTagTitle1",
                     "testTagDetail1",
@@ -54,19 +59,24 @@ public class InitDB {
         }
 
         public void dbInit2(){
+            /** 호스트 전용 Data */
             Member member = new Member("test2@email.com",
-                    "1234",
+                    "pass02",
                     "nickNam2",
                     LocalDate.of(2000, 12, 01),
-                    Role.VIEWER,
                     Gender.WOMAN);
             em.persist(member);
 
+            /**
+             * 성별 상관 없음
+             * 나이 범위: 20 ~ 25
+             * 태그 생성 위치: (37.61901, 127.05971)
+             */
             Tag tag = new Tag(
                     "testTagTitle2",
                     "testTagDetail2",
                     3,
-                    Gender.MAN,
+                    Gender.NOMATTER,
                     25,
                     20,
                     37.6190,
@@ -77,13 +87,53 @@ public class InitDB {
         }
 
         public void dbInit3() {
+            /** 호스트 전용 Data */
             Member member = new Member("test3@email.com",
-                    "password3",
+                    "pass03",
                     "nickNam3",
-                    LocalDate.of(1998, 02, 25),
-                    Role.VIEWER,
-                    Gender.WOMAN);
+                    LocalDate.of(2000, 02, 02),
+                    Gender.MAN);
             em.persist(member);
+
+            /**
+             * 남성만 모집
+             * 나이 범위: 20 ~ 25
+             * 태그 생성 위치: (37.6190, 127.0597)
+             */
+            Tag tag = new Tag(
+                    "testTagTitle1",
+                    "testTagDetail1",
+                    1,
+                    Gender.MAN,
+                    25,
+                    20,
+                    37.6190,
+                    127.0597,
+                    member
+            );
+            em.persist(tag);
+        }
+
+        public void dbInit4() {
+            Member member = new Member("test4@email.com",
+                    "pass04",
+                    "nickNam4",
+                    LocalDate.of(2010, 10, 11),
+                    Gender.MAN);
+            em.persist(member);
+
+            Tag tag = new Tag(
+                    "testTagTitle2",
+                    "testTagDetail2",
+                    3,
+                    Gender.NOMATTER,
+                    25,
+                    20,
+                    37.61901,
+                    127.05971,
+                    member
+            );
+            em.persist(tag);
         }
     }
 
