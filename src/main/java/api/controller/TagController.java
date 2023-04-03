@@ -5,6 +5,7 @@ import api.domain.dtos.*;
 import api.repository.TagRepository;
 import api.service.TagService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class TagController {
     private final TagRepository tagRepository;
     private final TagService tagService;
@@ -57,8 +59,10 @@ public class TagController {
     @PostMapping("/tags/{tagId}/subscribe")
     public SubscribeTagResponse subscribeTag(
             @PathVariable("tagId")Long tagId,
-            Long memberId )
+            @RequestParam("memberId") Long memberId )
     {
+        log.info("tagId={}",tagId);
+        log.info("memberId={}",memberId);
         return tagService.subscribeTag(tagId, memberId);
     }
 
@@ -68,7 +72,7 @@ public class TagController {
     @PostMapping("/tags/{tagId}/unsubscribe")
     public ResponseEntity unsubscribeTag(
             @PathVariable("tagId")Long tagId,
-            Long memberId )
+            @RequestParam("memberId") Long memberId )
     {
         tagService.unsubscribeTag(tagId,memberId);
         return new ResponseEntity(HttpStatus.OK);
