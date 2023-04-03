@@ -25,6 +25,7 @@ public class Tag {
     private String title;   // 타이틀
     private String detail;  // 상세설명
     private int maxNum;
+    @Enumerated(EnumType.STRING)
     private Gender targetGender; // 모집 성별
     private Integer targetAgeUpper;  // 모집 나이 상한
     private Integer targetAgeLower; //모집 나이 하한
