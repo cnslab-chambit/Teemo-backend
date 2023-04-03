@@ -2,13 +2,10 @@ package api.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -27,7 +24,7 @@ public class Tag {
     // 모집 정보
     private String title;   // 타이틀
     private String detail;  // 상세설명
-    private int limit;
+    private int maxNum;
     private Gender targetGender; // 모집 성별
     private Integer targetAgeUpper;  // 모집 나이 상한
     private Integer targetAgeLower; //모집 나이 하한
@@ -44,7 +41,7 @@ public class Tag {
     public Tag(
             String title,
             String detail,
-            int limit,
+            int maxNum,
             Gender targetGender,
             Integer targetAgeUpper,
             Integer targetAgeLower,
@@ -55,7 +52,7 @@ public class Tag {
 
         this.title = title;
         this.detail = detail;
-        this.limit = limit;
+        this.maxNum = maxNum;
         this.targetGender = targetGender;
         this.targetAgeUpper = targetAgeUpper;
         this.targetAgeLower = targetAgeLower;
