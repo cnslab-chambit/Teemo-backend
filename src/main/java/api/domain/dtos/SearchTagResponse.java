@@ -4,13 +4,15 @@ import api.domain.Gender;
 import api.domain.Member;
 import api.domain.Tag;
 import api.util.DateTimeParse;
+import lombok.Data;
 
+@Data
 public class SearchTagResponse {
     private Long id; // Tag Id
 
     private String title;
     private String detail;
-    private int limit;
+    private int maxNum;
     private int targetAgeUpper;
     private int targetAgeLower;
     private Gender targetGender;
@@ -25,7 +27,7 @@ public class SearchTagResponse {
         this.id = tag.getId();
         this.title = tag.getTitle();
         this.detail = tag.getDetail();
-        this.limit = tag.getLimit();
+        this.maxNum = tag.getMaxNum();
         this.targetAgeUpper = tag.getTargetAgeUpper();
         this.targetAgeLower = tag.getTargetAgeLower();
         this.targetGender = tag.getTargetGender();
