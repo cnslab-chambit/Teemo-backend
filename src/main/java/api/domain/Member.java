@@ -72,7 +72,7 @@ public class Member {
     public void setEmail(String email){
         this.email = email;
     }
-    public void setPassword(String Password){
+    public void setPassword(String password){
         this.password = password;
     }
     public void setNickname(String nickname){
