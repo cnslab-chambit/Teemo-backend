@@ -1,7 +1,9 @@
 package api.domain.dtos;
 
 import api.domain.Tag;
+import lombok.Data;
 
+@Data
 public class SubscribeTagResponse {
     private double latitude; // tag 의 위도
     private double longitude; // tag 의 경도
