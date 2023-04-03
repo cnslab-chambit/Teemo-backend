@@ -53,9 +53,6 @@ public class TagService {
         return tagRepository.save(tag);
     }
     public List<FindTagsResponse> findTags(Long memberId, Double latitude, Double longitude){
-        log.info("memberID=>{}",memberId);
-        log.info("latitude=>{}",latitude);
-        log.info("longitude=>{}",longitude);
         /** 내 근처 태그들 찾기
          *
          * 1. memberID로 조회자을 찾는다.
