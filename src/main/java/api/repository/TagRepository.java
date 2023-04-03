@@ -22,16 +22,15 @@ public class TagRepository {
 
     public List<Tag> findAll(double latitude, double longitude, int age){
         return em.createQuery(
-                "SELECT t FROM Tag t " +
-                        "WHERE t.targetAgeLower <= :age " +
-                        "AND t.targetAgeUpper >= :age " +
-                        "AND ABS(t.latitude - :latitude) < 0.009" +
-                        "AND ABS(t.longitude - :longitude) < 0.012",
+                        "SELECT t FROM Tag t " +
+                                "WHERE t.targetAgeLower <= :age " +
+                                "AND t.targetAgeUpper >= :age " +
+                                "AND ABS(t.latitude - :latitude) < 0.009 " + // 여기서 공백 추가
+                                "AND ABS(t.longitude - :longitude) < 0.012",
                         Tag.class)
-                .setParameter("age",age)
-                .setParameter("age",age)
-                .setParameter("latitude",latitude)
-                .setParameter("longitude",longitude)
+                .setParameter("age", age)
+                .setParameter("latitude", latitude)
+                .setParameter("longitude", longitude)
                 .getResultList();
     }
 

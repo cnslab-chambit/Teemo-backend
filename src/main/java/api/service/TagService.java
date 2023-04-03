@@ -10,6 +10,7 @@ import api.repository.MemberRepository;
 import api.repository.TagRepository;
 import api.util.DateTimeParse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true) // 기본적으로 조회
+@Slf4j
 public class TagService {
 
     private final TagRepository tagRepository;
@@ -51,10 +53,13 @@ public class TagService {
         return tagRepository.save(tag);
     }
     public List<FindTagsResponse> findTags(Long memberId, Double latitude, Double longitude){
+        log.info("memberID=>{}",memberId);
+        log.info("latitude=>{}",latitude);
+        log.info("longitude=>{}",longitude);
         /** 내 근처 태그들 찾기
          *
-         * 1. memberID로 회원을 찾는다.
-         * 2. 회원의 성별, 나이를 찾는다.
+         * 1. memberID로 조회자을 찾는다.
+         * 2. 조회자의 성별, 나이를 찾는다.
          * 3. 나이, 위도, 경도 조건에 맞는 Tag 를 찾는다.
          * 4. 성별 조건을 검사(tag 의 성별조건이 조회자의 성별과 일치하거나, 'NOMATTER')하고, DTO 리스트로 변환한다.
          */
