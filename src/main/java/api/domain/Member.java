@@ -3,8 +3,6 @@ package api.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,9 +18,8 @@ public class Member {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
     @Column(name = "password", nullable = false)
-    @NotNull
     private String password;
-    @Column(name = "password")
+    @Column(name = "nickname")
     private String nickname;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;    // 생년월일 (만 나이를 구하기 위해서)
@@ -44,6 +41,8 @@ public class Member {
     @OneToOne(mappedBy = "guest", cascade = CascadeType.REMOVE)
     private Chatroom guestChatroom;
 
+    private LocalDate createAt; // 계정 생성 년월일 저장
+
 
     //==기본 생성자==//
     public Member(){}
@@ -53,22 +52,18 @@ public class Member {
                   String password,
                   String nickname,
                   LocalDate birthday,
-                  Role role,
                   Gender gender)
     {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.birthday = birthday;
-        this.role = role;
         this.gender = gender;
+        this.role = Role.VIEWER;
     }
 
-    public void setTag(Tag tag){
+    public void setTagRole(Tag tag, Role role){
         this.tag = tag;
-    }
-
-    public void setRole(Role role){
         this.role = role;
     }
 
@@ -79,7 +74,7 @@ public class Member {
     public void setEmail(String email){
         this.email = email;
     }
-    public void setPassword(String Password){
+    public void setPassword(String password){
         this.password = password;
     }
     public void setNickname(String nickname){

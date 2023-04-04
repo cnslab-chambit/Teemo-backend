@@ -28,57 +28,54 @@ public class MemberController {
                 request.getPassword(),
                 request.getNickname(),
                 request.getBirthday(),
-                request.getRole(),
                 request.getGender()
         );
         // 추후 중복 Email 확인
         Long memberId = memberService.join(member);
         return new ResponseEntity(HttpStatus.CREATED);
     }
-
     /**
      * 자기 정보 조회
      */
-    @GetMapping("/members/{member_id}")
-    public FindMemberResponse findMemberById(@PathVariable("member_id")Long memberId){
+    @GetMapping("/members/{memberId}")
+    public FindMemberResponse findMemberById(@PathVariable("memberId")Long memberId){
         Member member = memberService.findById(memberId);
         return new FindMemberResponse(member);
     }
-
     /**
      * 이메일 수정
      */
-    @PatchMapping("/members/{member_id}/email")
-    public ResponseEntity updateMemberEmail(@PathVariable("member_id")Long memberId,String email){
+    @PatchMapping("/members/{memberId}/email")
+    public ResponseEntity updateMemberEmail(
+            @PathVariable("memberId")Long memberId,
+            @RequestParam("email")String email){
         memberService.updateEmail(memberId,email);
         return new ResponseEntity(HttpStatus.OK);
     }
-
     /**
      * 비밀번호 수정
      */
-    @PatchMapping("/members/{member_id}/password")
-    public ResponseEntity updateMemberPassword(@PathVariable("member_id")Long memberId,String password){
+    @PatchMapping("/members/{memberId}/password")
+    public ResponseEntity updateMemberPassword(@PathVariable("memberId")Long memberId,
+                                               @RequestParam("password")String password){
         memberService.updatePassword(memberId,password);
         return new ResponseEntity(HttpStatus.OK);
     }
-
     /**
      * 닉네임 수정
      */
-    @PatchMapping("/members/{member_id}/nickname")
-    public ResponseEntity updateMemberNickname(@PathVariable("member_id")Long memberId,String nickname){
+    @PatchMapping("/members/{memberId}/nickname")
+    public ResponseEntity updateMemberNickname(@PathVariable("memberId")Long memberId,
+                                               @RequestParam("nickname")String nickname){
         memberService.updateNickname(memberId,nickname);
         return new ResponseEntity(HttpStatus.OK);
     }
-
     /**
      * 회원탈퇴
      */
-    @DeleteMapping("/members/{member_id}")
-    public ResponseEntity removeMember(@PathVariable("member_id")Long memberId){
+    @DeleteMapping("/members/{memberId}")
+    public ResponseEntity removeMember(@PathVariable("memberId")Long memberId){
         memberService.removeMember(memberId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
-
 }
