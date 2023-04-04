@@ -41,6 +41,8 @@ public class Member {
     @OneToOne(mappedBy = "guest", cascade = CascadeType.REMOVE)
     private Chatroom guestChatroom;
 
+    private LocalDate createAt; // 계정 생성 년월일 저장
+
 
     //==기본 생성자==//
     public Member(){}
