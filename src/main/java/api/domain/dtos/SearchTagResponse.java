@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class SearchTagResponse {
-    private Long id; // Tag Id
+    private Long tagId; // Tag Id
 
     private String title;
     private String detail;
@@ -24,7 +24,7 @@ public class SearchTagResponse {
     private int hostAge; // host 의 나이
 
     public SearchTagResponse(Tag tag, Member member){
-        this.id = tag.getId();
+        this.tagId = tag.getId();
         this.title = tag.getTitle();
         this.detail = tag.getDetail();
         this.maxNum = tag.getMaxNum();
