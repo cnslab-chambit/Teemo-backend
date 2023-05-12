@@ -2,6 +2,7 @@ package Teemo.Teemo_backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 public class User {
     @Id
     @GeneratedValue
@@ -20,7 +22,6 @@ public class User {
     private String password; // 비밀번호
     @Column(length = 10)
     private String nickname; // 닉네임
-    @JsonFormat(pattern = "yyyy-mm-dd")
     private LocalDate birthday; // 생년월일
     @Enumerated(EnumType.STRING)
     private Gender gender; // 성별
@@ -46,16 +47,22 @@ public class User {
             String email,
             String password,
             String nickname,
-            LocalDate birthday,
+            String birthday,
             Gender gender
     ){
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.birthday = birthday;
+        this.birthday = LocalDate.parse(birthday);
         this.gender = gender;
         createdAt = LocalDate.now(); // 가입일 저장
         deletedAt = createdAt.plusMonths(3); // 만료일은 가입일로부터 3개월 뒤
     }
 
+    /** 정보 설정 및 수정 메서드 **/
+    public void updateAccountInfo(String email, String password, String nickname){
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+    }
 }
