@@ -5,7 +5,9 @@ import Teemo.Teemo_backend.domain.User;
 import java.util.List;
 
 public interface UserRepository {
-    Long save(User user);   // 저장
+    void save(User user);   // 저장
     User findById(Long id); // id 로 검색
+    User findByEmail(String email);
+    User findByNickname(String nickname); // 닉네임으로 검색
     Long delete(User user); // 삭제
 }
