@@ -37,18 +37,17 @@ public class Tag {
     @JoinColumn(name = "host_id")
     private List<User> users = new ArrayList<>();  // 인덱스 0 은 호스트 정보, 나머지는 게스트 정보
 
-
     /** 생성자 **/
     public Tag(){};
     public Tag(
             String title,
             String detail,
-            int maxNum,
+            Integer maxNum,
             Gender targetGender,
             Integer upperAge,
             Integer lowerAge,
-            double latitude,
-            double longitude,
+            Double latitude,
+            Double longitude,
             User host
     ){
         this.title = title;
