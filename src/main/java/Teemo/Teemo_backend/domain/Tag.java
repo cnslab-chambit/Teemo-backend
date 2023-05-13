@@ -27,8 +27,8 @@ public class Tag {
     private Integer lowerAge; // 모집 나이 하한
 
     /** 태그정보 **/
-    private double latitude; // 태그 생성 위도
-    private double longitude; // 태크 생성 경도
+    private Double latitude; // 태그 생성 위도
+    private Double longitude; // 태크 생성 경도
     private LocalDateTime createdAt; // tag 생성 시간
     private LocalDateTime deletedAt; // tag 삭제 시간
 
