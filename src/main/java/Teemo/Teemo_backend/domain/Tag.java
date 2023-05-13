@@ -33,7 +33,7 @@ public class Tag {
     private LocalDateTime deletedAt; // tag 삭제 시간
 
     /** 매핑관계 **/
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id")
     private List<User> users = new ArrayList<>();  // 인덱스 0 은 호스트 정보, 나머지는 게스트 정보
 
