@@ -44,7 +44,8 @@ public class UserServiceImpl implements UserService{
     public User find(Long id) {
         /**
          * [제약조건]
-         * 1. 아이디로 유저를 찾지 못한 경우
+         * 1. 빈 값인지 확인
+         * 2. 아이디로 유저를 찾지 못한 경우
          */
 
         User user = userRepository.findById(id);
@@ -55,7 +56,8 @@ public class UserServiceImpl implements UserService{
     public void update(UserUpdateRequest request) {
         /**
          * [제약조건]
-         * 1. 아이디로 유저를 찾지 못한 경우
+         * 1. 빈 값인지 확인
+         * 2. 아이디로 유저를 찾지 못한 경우
          */
         Long id = request.getId();
         String email = request.getEmail();
@@ -70,7 +72,8 @@ public class UserServiceImpl implements UserService{
     public void remove(Long id) {
         /**
          * [제약조건]
-         * 1. 아이디로 유저를 찾지 못한 경우
+         * 1. 빈 값인지 확인
+         * 2. 아이디로 유저를 찾지 못한 경우
          */
         User user = userRepository.findById(id);
         userRepository.delete(user);
