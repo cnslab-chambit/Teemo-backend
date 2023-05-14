@@ -65,4 +65,16 @@ public class User {
         this.password = password;
         this.nickname = nickname;
     }
+
+    public void setTag(Tag tag){
+        this.tag = tag;
+    }
+    public void unsetTag(){
+        this.tag = null;
+    }
+
+    public void setRole(Role role){
+        this.role = role;
+    }
+
 }
