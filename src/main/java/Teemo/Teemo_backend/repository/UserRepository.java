@@ -9,5 +9,5 @@ public interface UserRepository {
     User findById(Long id); // id 로 검색
     User findByEmail(String email);
     User findByNickname(String nickname); // 닉네임으로 검색
-    Long delete(User user); // 삭제
+    void delete(User user); // 삭제
 }
