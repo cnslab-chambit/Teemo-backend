@@ -1,11 +1,7 @@
 package Teemo.Teemo_backend.controller;
 
 import Teemo.Teemo_backend.domain.Tag;
-import Teemo.Teemo_backend.domain.dtos.TagCreateRequest;
-import Teemo.Teemo_backend.domain.dtos.TagFindResponse;
-import Teemo.Teemo_backend.domain.dtos.TagSearchResponse;
-import Teemo.Teemo_backend.domain.dtos.TagSubscribeResponse;
-import Teemo.Teemo_backend.repository.TagRepository;
+import Teemo.Teemo_backend.domain.dtos.*;
 import Teemo.Teemo_backend.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,11 +35,11 @@ public class TagController {
      * @input   : memberId, latitude, longitude
      * @output  : [ {tagId,latitude,longitude},{tagId,latitude,longitude},....,{tagId,latitude,longitude} ]
      */
-    @GetMapping("/search/{memberId}/{latitude}/{longitude}")
+    @GetMapping("/search")
     public List<TagSearchResponse> searchTags(
-            @PathVariable Long memberId,
-            @PathVariable Double latitude,
-            @PathVariable Double longitude
+            @RequestParam("memberId") Long memberId,
+            @RequestParam("latitude") Double latitude,
+            @RequestParam("longitude") Double longitude
     )
     {
         List<Tag> list = tagService.search(memberId,latitude,longitude);
@@ -73,12 +69,9 @@ public class TagController {
      * @input   : memberId, tagId
      * @output  : tagId, latitude, longitude
      */
-    @PostMapping("/subscribe/{memberId}/{tagId}")
-    public TagSubscribeResponse subscribeTag(
-            @PathVariable("memberId")Long memberId,
-            @PathVariable("tagId") Long tagId
-    ){
-        TagSubscribeResponse response = tagService.subscribe(memberId, tagId);
+    @PostMapping("/subscribe")
+    public TagSubscribeResponse subscribeTag(@RequestBody TagCommonRequest request){
+        TagSubscribeResponse response = tagService.subscribe(request.getMemberId(),request.getTagId());
         return response;
     }
 
@@ -88,11 +81,9 @@ public class TagController {
      * @input   : memberId, tagId
      * @output  : 200 OK
      */
-    @PostMapping("/unsubscribe/{memberId}/{tagId}")
-    public ResponseEntity unsubscribeTag(
-            @PathVariable("memberId") Long memberId, @PathVariable("tagId") Long tagId
-    ){
-        tagService.unsubscribe(memberId,tagId);
+    @PostMapping("/unsubscribe")
+    public ResponseEntity unsubscribeTag(@RequestBody TagCommonRequest request){
+        tagService.unsubscribe(request.getMemberId(),request.getTagId());
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -102,11 +93,9 @@ public class TagController {
      * @input   : tagId
      * @output  : 204 No Content
      */
-    @DeleteMapping("/delete/{memberId}/{tagId}")
-    public ResponseEntity deleteTag(
-            @PathVariable("memberId") Long memberId,
-            @PathVariable("tagId") Long tagId){
-        tagService.remove(memberId,tagId);
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteTag(@RequestBody TagCommonRequest request){
+        tagService.remove(request.getMemberId(),request.getTagId());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
