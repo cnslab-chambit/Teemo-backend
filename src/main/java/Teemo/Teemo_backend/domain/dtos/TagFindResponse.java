@@ -1,6 +1,13 @@
 package Teemo.Teemo_backend.domain.dtos;
 
 import Teemo.Teemo_backend.domain.Gender;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class TagFindResponse {
         private Long tagId;
         private String title;
@@ -12,28 +19,4 @@ public class TagFindResponse {
         private String hostNickname;
         private Gender hostGender;
         private Integer hostAge;
-
-        public TagFindResponse(
-                Long tagId,
-                String title,
-                Integer maxNum,
-                Gender targetGender,
-                Integer upperAge,
-                Integer lowerAge,
-                Integer remainingMinutes, // 분
-                String hostNickname,
-                Gender hostGender,
-                Integer hostAge
-        ){
-                this.tagId = tagId;
-                this.title = title;
-                this.maxNum = maxNum;
-                this.targetGender = targetGender;
-                this.upperAge = upperAge;
-                this.lowerAge = lowerAge;
-                this.remainingMinutes = remainingMinutes;
-                this.hostNickname = hostNickname;
-                this.hostGender = hostGender;
-                this.hostAge = hostAge;
-        }
 }
