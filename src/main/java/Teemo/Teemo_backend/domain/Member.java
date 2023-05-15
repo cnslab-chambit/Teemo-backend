@@ -53,8 +53,9 @@ public class Member {
         this.nickname = nickname;
         this.birthday = LocalDate.parse(birthday);
         this.gender = gender;
-        createdAt = LocalDate.now(); // 가입일 저장
-        deletedAt = createdAt.plusMonths(3); // 만료일은 가입일로부터 3개월 뒤
+        this.role = Role.VIEWER; // 초기 생성시 역할은 Viewer
+        this.createdAt = LocalDate.now(); // 가입일 저장
+        this.deletedAt = createdAt.plusMonths(3); // 만료일은 가입일로부터 3개월 뒤
     }
 
     /** 정보 설정 및 수정 메서드 **/
