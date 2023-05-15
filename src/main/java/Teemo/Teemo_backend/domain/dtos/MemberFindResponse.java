@@ -1,9 +1,13 @@
 package Teemo.Teemo_backend.domain.dtos;
 
 import Teemo.Teemo_backend.domain.Gender;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@NoArgsConstructor
+@Getter
 public class MemberFindResponse {
     private String email;
     private String password;
