@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class TagCreateRequest {
-    private Long userId;
+    private Long memberId;
     private Double latitude;
     private Double longitude;
     private String title;

@@ -14,7 +14,7 @@ public class Chatroom {
     private Long id; // db 탐색용 고유 식별자
 
     @OneToMany(fetch = FetchType.LAZY)
-    private List<User> users = new ArrayList<>(); // { 호스트 정보, 게스트 정보 }
+    private List<Member> members = new ArrayList<>(); // { 호스트 정보, 게스트 정보 }
 
     @OneToMany(mappedBy = "chatroom", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chat> chats = new ArrayList<>(); // 채팅정보
@@ -25,11 +25,11 @@ public class Chatroom {
     /** 생성자 **/
     public Chatroom(){}
     public Chatroom(
-            User host,
-            User guest
+            Member host,
+            Member guest
     ){
-        users.add(host);
-        users.add(guest);
+        members.add(host);
+        members.add(guest);
         createdAt = LocalDateTime.now();
         deletedAt = createdAt.plusHours(2); // 2시간 뒤 파기
     }

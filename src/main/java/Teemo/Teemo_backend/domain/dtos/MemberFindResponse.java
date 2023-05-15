@@ -1,11 +1,10 @@
 package Teemo.Teemo_backend.domain.dtos;
 
 import Teemo.Teemo_backend.domain.Gender;
-import lombok.Getter;
 
 import java.time.LocalDate;
 
-public class UserFindResponse {
+public class MemberFindResponse {
     private String email;
     private String password;
     private String nickname;
@@ -14,7 +13,7 @@ public class UserFindResponse {
     private String createdAt;
     private String deletedAt;
 
-    public UserFindResponse(
+    public MemberFindResponse(
             String email,
             String password,
             String nickname,

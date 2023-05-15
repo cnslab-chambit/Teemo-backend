@@ -1,25 +1,22 @@
 package Teemo.Teemo_backend.service;
 
 import Teemo.Teemo_backend.domain.Gender;
-import Teemo.Teemo_backend.domain.User;
-import Teemo.Teemo_backend.domain.dtos.UserFindResponse;
-import Teemo.Teemo_backend.domain.dtos.UserSignupRequest;
-import Teemo.Teemo_backend.domain.dtos.UserUpdateRequest;
-import Teemo.Teemo_backend.repository.UserRepository;
+import Teemo.Teemo_backend.domain.Member;
+import Teemo.Teemo_backend.domain.dtos.MemberSignupRequest;
+import Teemo.Teemo_backend.domain.dtos.MemberUpdateRequest;
+import Teemo.Teemo_backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
-    private final UserRepository userRepository;
+public class MemberServiceImpl implements MemberService {
+    private final MemberRepository memberRepository;
     @Override
     @Transactional
-    public void join(UserSignupRequest request) {
+    public void join(MemberSignupRequest request) {
         String email = request.getEmail();
         String password = request.getPassword();
         String nickname = request.getNickname();
@@ -36,24 +33,24 @@ public class UserServiceImpl implements UserService{
          * 6. 닉네임 길이 조건 확인 : [2 ~ 10] 자 사이의 길이를 가져야 한다. (경계값 포함)
          * 7. 생년월일 조건 확인 : ( 금일 기준 100 년 전 ~ 금일 ) 사이의 값을 가져야 한다. (경계값 미포함)
          */
-        User user = new User(email,password,nickname,birthday,gender);
-        userRepository.save(user);
+        Member member = new Member(email,password,nickname,birthday,gender);
+        memberRepository.save(member);
     }
 
     @Override
-    public User find(Long id) {
+    public Member find(Long id) {
         /**
          * [제약조건]
          * 1. 빈 값인지 확인
          * 2. 아이디로 유저를 찾지 못한 경우
          */
 
-        User user = userRepository.findById(id);
-        return user;
+        Member member = memberRepository.findById(id);
+        return member;
     }
 
     @Override
-    public void update(UserUpdateRequest request) {
+    public void update(MemberUpdateRequest request) {
         /**
          * [제약조건]
          * 1. 빈 값인지 확인
@@ -64,8 +61,8 @@ public class UserServiceImpl implements UserService{
         String password = request.getPassword();
         String nickname = request.getNickname();
 
-        User user = userRepository.findById(id);
-        user.updateAccountInfo(email,password,nickname);
+        Member member = memberRepository.findById(id);
+        member.updateAccountInfo(email,password,nickname);
     }
 
     @Override
@@ -75,7 +72,7 @@ public class UserServiceImpl implements UserService{
          * 1. 빈 값인지 확인
          * 2. 아이디로 유저를 찾지 못한 경우
          */
-        User user = userRepository.findById(id);
-        userRepository.delete(user);
+        Member member = memberRepository.findById(id);
+        memberRepository.delete(member);
     }
 }

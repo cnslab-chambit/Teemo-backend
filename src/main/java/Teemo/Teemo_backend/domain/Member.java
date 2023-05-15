@@ -1,20 +1,18 @@
 package Teemo.Teemo_backend.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-public class User {
+public class Member {
     @Id
     @GeneratedValue
-    @Column(name = "user_id")
+    @Column(name = "member_id")
     private Long id;
 
     /** 가입 정보 **/
@@ -42,8 +40,8 @@ public class User {
     private List<Chatroom> chatrooms = new ArrayList<>(); // 참여 중인 채팅방 리스트(호스트는 10개, 게스트 1개 의 원소를 가질 수 있다.)
 
     /** 생성자 **/
-    public User(){}
-    public User(
+    public Member(){}
+    public Member(
             String email,
             String password,
             String nickname,

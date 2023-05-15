@@ -2,12 +2,12 @@ package Teemo.Teemo_backend.service;
 
 import Teemo.Teemo_backend.domain.Gender;
 import Teemo.Teemo_backend.domain.Tag;
-import Teemo.Teemo_backend.domain.User;
+import Teemo.Teemo_backend.domain.Member;
 import Teemo.Teemo_backend.domain.dtos.TagCreateRequest;
 import Teemo.Teemo_backend.domain.dtos.TagFindResponse;
 import Teemo.Teemo_backend.domain.dtos.TagSubscribeResponse;
 import Teemo.Teemo_backend.repository.TagRepository;
-import Teemo.Teemo_backend.repository.UserRepository;
+import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.util.DateTimeParse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService{
     private final TagRepository tagRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     @Override
     @Transactional
     public void upload(TagCreateRequest request) {
@@ -38,7 +38,7 @@ public class TagServiceImpl implements TagService{
          * 8. latitude 범위 조건 확인
          * 9. longitude 범위 조건 확인
          */
-        Long userId = request.getUserId();
+        Long memberId = request.getMemberId();
         Double latitude = request.getLatitude();
         Double longitude = request.getLongitude();
         String title = request.getTitle();
@@ -48,7 +48,7 @@ public class TagServiceImpl implements TagService{
         Integer upperAge = request.getUpperAge();
         Integer lowerAge = request.getLowerAge();
 
-        User host = userRepository.findById(userId);
+        Member host = memberRepository.findById(memberId);
 
         Tag tag = new Tag(title,detail,maxNum,targetGender,upperAge,lowerAge,latitude,longitude,host);
         tagRepository.save(tag);
@@ -57,18 +57,18 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public List<Tag> search(Long userId, Double latitude, Double longitude) {
+    public List<Tag> search(Long memberId, Double latitude, Double longitude) {
         /**
          * [과정]
-         * 1. userId 로 조회자을 찾는다.
+         * 1. memberId 로 조회자을 찾는다.
          * 2. 조회자의 성별, 나이를 찾는다.
          * 3. 나이, 위도, 경도 조건에 맞는 Tag 를 찾는다.
          * 4. 성별 조건을 검사(Tag 의 성별조건이 조회자의 성별과 일치하거나, Tag 의 성별조건이 'N')
          */
 
-        User user = userRepository.findById(userId);
-        Gender gender = user.getGender();
-        Integer age = DateTimeParse.calculateAge(user.getBirthday());
+        Member member = memberRepository.findById(memberId);
+        Gender gender = member.getGender();
+        Integer age = DateTimeParse.calculateAge(member.getBirthday());
         List<Tag> findTags = tagRepository.findByCriteria(latitude, longitude, age, gender);
         return findTags;
     }
@@ -86,8 +86,8 @@ public class TagServiceImpl implements TagService{
         Tag tag = tagRepository.findById(tagId);
 
         // [과정 2]
-        List<User> users = tag.getUsers();
-        User host = users.get(0); // 호스트는 0번
+        List<Member> members = tag.getMembers();
+        Member host = members.get(0); // 호스트는 0번
 /*
  Long tagId,
                 String title,
@@ -120,11 +120,11 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public TagSubscribeResponse subscribe(Long userId, Long tagId) {
+    public TagSubscribeResponse subscribe(Long memberId, Long tagId) {
         /**
          * [과정]
          * 1. tagId로 Tag 정보를 가져온다.
-         * 2. userId로 사용자 정보를 가져온다.
+         * 2. memberId로 사용자 정보를 가져온다.
          * 3. Tag 에 Guest 추가 & 연관된 사용자 정보에서 Tag 를 등록 & 연관된 사용자 정보에서 역할을 VIEWER 로 변경
          * 4. DTO 변환 이후 반환
          */
@@ -132,20 +132,20 @@ public class TagServiceImpl implements TagService{
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
         // [과정 2]
-        User user = userRepository.findById(userId);
+        Member member = memberRepository.findById(memberId);
         // [과정 3]
-        tag.addGuest(user);
+        tag.addGuest(member);
         //[과정 4]
         TagSubscribeResponse response = new TagSubscribeResponse(tag.getId(), tag.getLatitude(), tag.getLongitude());
         return response;
     }
 
     @Override
-    public void unsubscribe(Long userId, Long tagId) {
+    public void unsubscribe(Long memberId, Long tagId) {
         /**
          * [과정]
          * 1. tagId로 Tag 정보를 가져온다.
-         * 2. userId로 사용자 정보를 가져온다.
+         * 2. memberId로 사용자 정보를 가져온다.
          * 3. Tag 에 Guest 제거 & 연관된 사용자 정보에서 Tag 를 해제 & 연관된 사용자 정보에서 역할을 GUEST 로 변경
          * 4. 만약 host 와의 Chatroom 이 있다면, 해당 Chatroom 을 삭제해준다.
          */
@@ -153,31 +153,31 @@ public class TagServiceImpl implements TagService{
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
         // [과정 2]
-        User user = userRepository.findById(userId);
+        Member member = memberRepository.findById(memberId);
         // [과정 3]
-        tag.removeGuest(user);
+        tag.removeGuest(member);
         // [과정 4]
         // 추후에 구현
     }
 
     @Override
-    public void remove(Long userId, Long tagId) {
+    public void remove(Long memberId, Long tagId) {
         /**
          * [과정]
          * 1. tagId로 Tag 정보를 가져온다.
-         * 2. userId로 사용자 정보를 가져온다.
+         * 2. memberId로 사용자 정보를 가져온다.
          * 3. Tag 에서 모든 사용자 정보 제거 & 연관된 사용자 정보에서 Tag 를 해제 & 연관된 사용자 정보에서 역할을 GUEST 로 변경
          * 4. tag 를 제거한다.
          *
          * [제약조건]
-         * Tag 에 저장된 호스트 정보와 userId 로 찾은 사용자의 정보가 일치하는 지 확인한다.
+         * Tag 에 저장된 호스트 정보와 memberId 로 찾은 사용자의 정보가 일치하는 지 확인한다.
          */
 
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
         // [과정 2]
-        User user = userRepository.findById(userId);
+        Member member = memberRepository.findById(memberId);
         // [과정 3]
-        tag.removeAllUsers();
+        tag.removeAllMembers();
     }
 }

@@ -24,7 +24,7 @@ public class TagController {
     /**
      * 태그 생성
      *
-     * @input   : userId, latitude, longitude, title, detail, maxNum, targetGender, upperAge, lowerAge
+     * @input   : memberId, latitude, longitude, title, detail, maxNum, targetGender, upperAge, lowerAge
      * @output  : 201 CREATED
      */
     @PostMapping("/upload")
@@ -36,17 +36,17 @@ public class TagController {
     /**
      * 주변 태그 검색
      *
-     * @input   : userId, latitude, longitude
+     * @input   : memberId, latitude, longitude
      * @output  : [ {tagId,latitude,longitude},{tagId,latitude,longitude},....,{tagId,latitude,longitude} ]
      */
-    @GetMapping("/find/{userId}/{latitude}/{longitude}")
+    @GetMapping("/find/{memberId}/{latitude}/{longitude}")
     public List<TagSearchResponse> searchTags(
-            @PathVariable Long userId,
+            @PathVariable Long memberId,
             @PathVariable Double latitude,
             @PathVariable Double longitude
     )
     {
-        List<Tag> list = tagService.search(userId,latitude,longitude);
+        List<Tag> list = tagService.search(memberId,latitude,longitude);
         List<TagSearchResponse> responses = new ArrayList<>();
         for(Tag tag: list){
             responses.add(new TagSearchResponse(tag.getId(),tag.getLatitude(),tag.getLongitude()));
@@ -70,29 +70,29 @@ public class TagController {
     /**
      * 특정 태그 구독
      *
-     * @input   : userId, tagId
+     * @input   : memberId, tagId
      * @output  : tagId, latitude, longitude
      */
-    @PostMapping("/subscribe/{userId}/{tagId}")
+    @PostMapping("/subscribe/{memberId}/{tagId}")
     public TagSubscribeResponse subscribeTag(
-            @PathVariable("userId")Long userId,
+            @PathVariable("memberId")Long memberId,
             @PathVariable("tagId") Long tagId
     ){
-        TagSubscribeResponse response = tagService.subscribe(userId, tagId);
+        TagSubscribeResponse response = tagService.subscribe(memberId, tagId);
         return response;
     }
 
     /**
      * 특정 태그 구독 취소
      *
-     * @input   : tagId, userId
+     * @input   : memberId, tagId
      * @output  : 200 OK
      */
-    @PostMapping("/unsubscribe/{userId}/{tagId}")
+    @PostMapping("/unsubscribe/{memberId}/{tagId}")
     public ResponseEntity unsubscribeTag(
-            @PathVariable("userId") Long userId, @PathVariable("tagId") Long tagId
+            @PathVariable("memberId") Long memberId, @PathVariable("tagId") Long tagId
     ){
-        tagService.unsubscribe(userId,tagId);
+        tagService.unsubscribe(memberId,tagId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -102,11 +102,11 @@ public class TagController {
      * @input   : tagId
      * @output  : 204 No Content
      */
-    @DeleteMapping("/delete/{userId}/{tagId}")
+    @DeleteMapping("/delete/{memberId}/{tagId}")
     public ResponseEntity deleteTag(
-            @PathVariable("userId") Long userId,
+            @PathVariable("memberId") Long memberId,
             @PathVariable("tagId") Long tagId){
-        tagService.remove(userId,tagId);
+        tagService.remove(memberId,tagId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

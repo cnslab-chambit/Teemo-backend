@@ -3,7 +3,6 @@ package Teemo.Teemo_backend.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +33,7 @@ public class Tag {
 
     /** 매핑관계 **/
     @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id")
-    private List<User> users = new ArrayList<>();  // 인덱스 0 은 호스트 정보, 나머지는 게스트 정보
+    private List<Member> members = new ArrayList<>();  // 인덱스 0 은 호스트 정보, 나머지는 게스트 정보
 
     /** 생성자 **/
     public Tag(){};
@@ -48,7 +46,7 @@ public class Tag {
             Integer lowerAge,
             Double latitude,
             Double longitude,
-            User host
+            Member host
     ){
         this.title = title;
         this.detail = detail;
@@ -58,34 +56,34 @@ public class Tag {
         this.lowerAge = lowerAge;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.users.add(host);
+        this.members.add(host);
         host.setRole(Role.HOST); // 호스트 역할 부여
         host.setTag(this); // 호스트 태그 등록
         createdAt = LocalDateTime.now(); // 태그 생성 시, 태그 생성 시간 저장 (서버기준)
         deletedAt = createdAt.plusHours(1); // 태그 삭제 시간은 생성 시간으로부터 1시간 뒤
     }
-    public void addGuest(User user){
-        user.setTag(this);
-        user.setRole(Role.GUEST);
-        this.users.add(user);
+    public void addGuest(Member member){
+        member.setTag(this);
+        member.setRole(Role.GUEST);
+        this.members.add(member);
     }
-    public void removeGuest(User user){
-        user.unsetTag();
-        user.setRole(Role.VIEWER);
+    public void removeGuest(Member member){
+        member.unsetTag();
+        member.setRole(Role.VIEWER);
 
-        for(int i = 1; i<this.users.size(); i++)
-            if(users.get(i).equals(user)){
-                users.remove(i);
+        for(int i = 1; i<this.members.size(); i++)
+            if(members.get(i).equals(member)){
+                members.remove(i);
                 break;
             }
     }
-    public void removeAllUsers(){
+    public void removeAllMembers(){
         int idx=0;
-        for(User user: this.users){
-            user.unsetTag();
-            user.setRole(Role.VIEWER);
+        for(Member member : this.members){
+            member.unsetTag();
+            member.setRole(Role.VIEWER);
         }
-        users = new ArrayList<>();
+        members = new ArrayList<>();
     }
 
 }
