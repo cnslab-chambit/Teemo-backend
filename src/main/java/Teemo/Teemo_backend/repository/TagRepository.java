@@ -9,5 +9,5 @@ public interface TagRepository {
     void save(Tag tag); // 저장
     Tag findById(Long tagId); // id 로 검색
     List<Tag> findByCriteria(Double latitude, Double longitude, Integer age, Gender gender); // 조건에 맞춰 불러오기
-    Long delete(Tag tag); // 삭제
+    void delete(Tag tag); // 삭제
 }
