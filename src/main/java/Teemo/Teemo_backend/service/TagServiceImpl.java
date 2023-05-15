@@ -171,5 +171,7 @@ public class TagServiceImpl implements TagService{
         Member member = memberRepository.findById(memberId);
         // [과정 3]
         tag.removeAllMembers();
+        // [과정 4]
+        tagRepository.delete(tag);
     }
 }
