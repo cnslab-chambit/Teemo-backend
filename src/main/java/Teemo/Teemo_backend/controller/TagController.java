@@ -39,7 +39,7 @@ public class TagController {
      * @input   : memberId, latitude, longitude
      * @output  : [ {tagId,latitude,longitude},{tagId,latitude,longitude},....,{tagId,latitude,longitude} ]
      */
-    @GetMapping("/find/{memberId}/{latitude}/{longitude}")
+    @GetMapping("/search/{memberId}/{latitude}/{longitude}")
     public List<TagSearchResponse> searchTags(
             @PathVariable Long memberId,
             @PathVariable Double latitude,
@@ -60,7 +60,7 @@ public class TagController {
      * @input   : tagId
      * @output  : tagId, title, maxNum, targetGender, upperAge, lowerAge, remainingTime, hostNickName, hostGender, hostAge
      */
-    @GetMapping("/search/{tagId}")
+    @GetMapping("/find/{tagId}")
     public TagFindResponse findTag(@PathVariable Long tagId)
     {
         return tagService.find(tagId);
