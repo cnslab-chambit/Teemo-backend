@@ -88,18 +88,7 @@ public class TagServiceImpl implements TagService{
         // [과정 2]
         List<Member> members = tag.getMembers();
         Member host = members.get(0); // 호스트는 0번
-/*
- Long tagId,
-                String title,
-                Integer maxNum,
-                Gender targetGender,
-                Integer upperAge,
-                Integer lowerAge,
-                Integer remainingMinutes, // 분
-                String hostNickname,
-                Gender hostGender,
-                Integer hostAge
- */
+
         // [과정 3]
         Integer remainingMinutes = DateTimeParse.getRemainingInMinutes(tag.getDeletedAt());
         Integer hostAge = DateTimeParse.calculateAge(host.getBirthday());
@@ -120,12 +109,13 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
+    @Transactional
     public TagSubscribeResponse subscribe(Long memberId, Long tagId) {
         /**
          * [과정]
          * 1. tagId로 Tag 정보를 가져온다.
          * 2. memberId로 사용자 정보를 가져온다.
-         * 3. Tag 에 Guest 추가 & 연관된 사용자 정보에서 Tag 를 등록 & 연관된 사용자 정보에서 역할을 VIEWER 로 변경
+         * 3. Tag 에 Guest 추가 & 연관된 사용자 정보에서 Tag 를 등록 & 연관된 사용자 정보에서 역할을 Guest 로 변경
          * 4. DTO 변환 이후 반환
          */
 
@@ -141,6 +131,7 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
+    @Transactional
     public void unsubscribe(Long memberId, Long tagId) {
         /**
          * [과정]
@@ -161,6 +152,7 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
+    @Transactional
     public void remove(Long memberId, Long tagId) {
         /**
          * [과정]
