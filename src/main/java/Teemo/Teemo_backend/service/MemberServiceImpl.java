@@ -50,6 +50,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void update(MemberUpdateRequest request) {
         /**
          * [제약조건]
@@ -66,6 +67,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void remove(Long id) {
         /**
          * [제약조건]

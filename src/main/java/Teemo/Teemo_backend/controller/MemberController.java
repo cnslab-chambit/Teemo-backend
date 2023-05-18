@@ -34,8 +34,8 @@ public class MemberController {
     /**
      * 자기 정보 조회
      */
-    @GetMapping("/find/{memberId}")
-    public MemberFindResponse findMember(@PathVariable Long memberId){
+    @GetMapping("/find")
+    public MemberFindResponse findMember(@RequestParam Long memberId){
         Member member = null;
         try{
             member = memberService.find(memberId);

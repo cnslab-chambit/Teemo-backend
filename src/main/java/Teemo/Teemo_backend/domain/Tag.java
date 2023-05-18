@@ -34,6 +34,8 @@ public class Tag {
     /** 매핑관계 **/
     @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
     private List<Member> members = new ArrayList<>();  // 인덱스 0 은 호스트 정보, 나머지는 게스트 정보
+    @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
+    private List<Chatroom> chatrooms = new ArrayList<>();
 
     /** 생성자 **/
     public Tag(){};
@@ -84,6 +86,14 @@ public class Tag {
             member.setRole(Role.VIEWER);
         }
         members = new ArrayList<>();
+    }
+
+    public void addChatroom(Chatroom chatroom){
+        this.chatrooms.add(chatroom);
+    }
+
+    public void removeChatroom(){ // ! 이 부분 다시 수정해야 합니다.
+        this.chatrooms = null; // 완전 삭제가 아니라 식별자 전달받아서, 특정 chatroom 하나만 삭제해야 합니다.
     }
 
 }
