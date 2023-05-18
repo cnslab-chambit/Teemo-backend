@@ -35,9 +35,10 @@ public class Member {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag; // 태그 정보 (호스트나 게스트 모두 하나의 태그 정보만을 가진다.)
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id")
-    private List<Chatroom> chatrooms = new ArrayList<>(); // 참여 중인 채팅방 리스트(호스트는 10개, 게스트 1개 의 원소를 가질 수 있다.)
+
+    @OneToOne(mappedBy = "guest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Chatroom chatroom;
+
 
     /** 생성자 **/
     public Member(){}
@@ -71,9 +72,9 @@ public class Member {
     public void unsetTag(){
         this.tag = null;
     }
-
     public void setRole(Role role){
         this.role = role;
     }
-
+    public void setChatroom(Chatroom chatroom){this.chatroom = chatroom;}
+    public void unsetChatroom(){this.chatroom = null;}
 }
