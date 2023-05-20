@@ -1,5 +1,6 @@
 package Teemo.Teemo_backend.domain.dtos;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class MemberUpdateRequest {
+    @NotNull
     private Long id;
+    @NotNull
     private String email;
+    @NotNull
     private String password;
+    @NotNull
     private String nickname;
 }

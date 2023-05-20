@@ -1,14 +1,16 @@
 package Teemo.Teemo_backend.service;
 
-
 import Teemo.Teemo_backend.domain.*;
 import Teemo.Teemo_backend.domain.dtos.ChatroomCreateRequest;
 import Teemo.Teemo_backend.domain.dtos.ChatroomSearchResponse;
-import Teemo.Teemo_backend.repository.ChatRepository;
+import Teemo.Teemo_backend.error.InvalidRangeException;
+import Teemo.Teemo_backend.error.InvalidStateException;
 import Teemo.Teemo_backend.repository.ChatroomRepository;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.repository.TagRepository;
 import Teemo.Teemo_backend.util.DateTimeParse;
+import Teemo.Teemo_backend.validator.MemberValidator;
+import Teemo.Teemo_backend.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,9 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ChatroomServiceImpl implements ChatroomService{
+    private final TagValidator tagValidator;
+    private final MemberValidator memberValidator;
+
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
     private final ChatroomRepository chatroomRepository;
@@ -29,14 +34,22 @@ public class ChatroomServiceImpl implements ChatroomService{
     @Transactional
     public ChatroomSearchResponse create(ChatroomCreateRequest request) {
         /**
+         * [선제조건]
+         * 1. 유효한 Tag 인지 확인
+         *      1-1. Db에 저장되어 있나?
+         * 2. 유효한 사용자인지 확인
+         *      2-1. Db에 저장되어 있나?
+         *      2-2. 사용자의 역할이 "GUEST" 여야 한다.
+         *      2-3. 사용자에 이미 설정된 Tag 가 있어야 한다.
+         * 3. 현재 위치가 tag 위치로부터 500m 이내 인지를 판단
+         *      3-1. 위도 검사
+         *      3-2. 경도 검사
+         *
+         *
          * [과정]
          * 1. tagId로 Tag 정보를 가져온다.
          * 2. memberId로 사용자 정보를 가져온다.
          *
-         * [제약조건]
-         * 1. 빈 값인지 확인
-         * 2. 현재 위치가 tag 위치로부터 500m 이내 인지를 판단
-         * 3. 게스트인지 확인
          *
          *
          */
@@ -46,10 +59,32 @@ public class ChatroomServiceImpl implements ChatroomService{
         Double longitude = request.getLongitude();
 
         Tag tag = tagRepository.findById(tagId);
-        Member guest = memberRepository.findById(memberId);
-        Chatroom chatroom = Chatroom.createChatroom(guest,tag);
-        Long chatroomId = chatroomRepository.save(chatroom);
+        Member member = memberRepository.findById(memberId);
 
+        // [전제조건 1-1]
+        if(!tagValidator.found(tag))
+            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+        // [전제조건 2-1]
+        if(!memberValidator.found(member))
+            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+        // [전제조건 2-2]
+        if(!memberValidator.checkRole(member.getRole(), Role.GUEST))
+            throw new InvalidStateException("memberId","Chatroom 을 생성 할 수 있는 역할이 아닙니다.");
+        // [전제조건 2-3]
+        if(!memberValidator.found(member.getTag())) // 없으면 안된다.
+            throw new InvalidStateException("memberId","Chatroom 을 생성 할 수 있는 상태가 아닙니다.");
+        // [전제조건 3-1]
+        if( Math.abs(tag.getLatitude() - latitude) > 0.0045 )
+            throw new InvalidRangeException("latitude","Tag 의 위치로부터 500m 외각에 있습니다.");
+        // [전제조건 3-2]
+        if( Math.abs(tag.getLongitude() - longitude) > 0.006 )
+            throw new InvalidRangeException("longitude","Tag 의 위치로부터 500m 외각에 있습니다.");
+
+
+
+
+        Chatroom chatroom = Chatroom.createChatroom(member,tag);
+        Long chatroomId = chatroomRepository.save(chatroom);
 
         Member host = tag.getMembers().get(0);
         String nickname = host.getNickname();
@@ -149,7 +184,7 @@ public class ChatroomServiceImpl implements ChatroomService{
         //[과정 3]
         chatroom.removeGuest();
         //[과정 4]
-        chatroom.removeTag();
+        chatroom.unsetTag();
         //[과정 5]
         chatroomRepository.delete(chatroom);
     }

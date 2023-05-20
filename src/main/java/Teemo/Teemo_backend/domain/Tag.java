@@ -33,8 +33,9 @@ public class Tag {
 
     /** 매핑관계 **/
     @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
+    @OrderColumn(name = "member_order") // 순서보장
     private List<Member> members = new ArrayList<>();  // 인덱스 0 은 호스트 정보, 나머지는 게스트 정보
-    @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "tag",fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chatroom> chatrooms = new ArrayList<>();
 
     /** 생성자 **/
@@ -72,28 +73,39 @@ public class Tag {
     public void removeGuest(Member member){
         member.unsetTag();
         member.setRole(Role.VIEWER);
-
-        for(int i = 1; i<this.members.size(); i++)
-            if(members.get(i).equals(member)){
+        for(int i = 1; i<this.members.size(); i++){
+            if((members.get(i)).equals(member)){
                 members.remove(i);
                 break;
             }
+        }
     }
     public void removeAllMembers(){
-        int idx=0;
         for(Member member : this.members){
-            member.unsetTag();
-            member.setRole(Role.VIEWER);
+            member.unsetTag(); // 연관된 사용자 정보에서 Tag 를 해제
+            member.setRole(Role.VIEWER); // 연관된 사용자 정보에서 역할을 Viewer 로 변경
         }
-        members = new ArrayList<>();
+        members = new ArrayList<>(); // Tag 에서 모든 사용자 정보 제거
     }
 
     public void addChatroom(Chatroom chatroom){
         this.chatrooms.add(chatroom);
     }
 
-    public void removeChatroom(){ // ! 이 부분 다시 수정해야 합니다.
-        this.chatrooms = null; // 완전 삭제가 아니라 식별자 전달받아서, 특정 chatroom 하나만 삭제해야 합니다.
+    public void removeChatroom(Chatroom chatroom){
+        chatroom.unsetTag();
+        chatroom.removeGuest();
+        for(int i = 1; i<this.chatrooms.size(); i++){
+            if((chatrooms.get(i)).equals(chatroom)){
+                chatrooms.remove(i);
+                break;
+            }
+        }
     }
 
+    public void removeAllChatrooms(){
+        for(Chatroom chatroom : this.chatrooms)
+            chatroom.removeGuest(); // 이 태그와 관련된 Chatroom 에서 Chatroom 과 그것의 게시자들의 관계를 해제합니다.
+
+    }
 }
