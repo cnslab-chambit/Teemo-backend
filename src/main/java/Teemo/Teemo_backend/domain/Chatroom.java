@@ -60,7 +60,7 @@ public class Chatroom {
         this.guest.unsetChatroom();
         this.guest = null;
     }
-    public void removeTag(){ // Tag 와의 연관관계 해제
+    public void unsetTag(){ // Tag 와의 연관관계 해제
         this.tag = null;
     }
     @Override
