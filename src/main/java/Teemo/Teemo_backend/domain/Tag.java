@@ -33,6 +33,7 @@ public class Tag {
 
     /** 매핑관계 **/
     @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
+    @OrderColumn(name = "member_order") // 순서보장
     private List<Member> members = new ArrayList<>();  // 인덱스 0 은 호스트 정보, 나머지는 게스트 정보
     @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
     private List<Chatroom> chatrooms = new ArrayList<>();
@@ -72,12 +73,12 @@ public class Tag {
     public void removeGuest(Member member){
         member.unsetTag();
         member.setRole(Role.VIEWER);
-
-        for(int i = 1; i<this.members.size(); i++)
-            if(members.get(i).equals(member)){
+        for(int i = 1; i<this.members.size(); i++){
+            if((members.get(i)).equals(member)){
                 members.remove(i);
                 break;
             }
+        }
     }
     public void removeAllMembers(){
         int idx=0;
