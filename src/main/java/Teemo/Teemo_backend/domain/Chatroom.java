@@ -56,12 +56,11 @@ public class Chatroom {
         return chatroom;
     }
 
-    public void removeGuest(){
+    public void removeGuest(){ // Member(guest) 객체에서 이 Chatroom 객체 삭제 + 이 Chatroom 에서도 게스트와의 연관관계 해제
         this.guest.unsetChatroom();
         this.guest = null;
     }
-    public void removeTag(){
-        this.tag.removeChatroom();
+    public void removeTag(){ // Tag 와의 연관관계 해제
         this.tag = null;
     }
 }
