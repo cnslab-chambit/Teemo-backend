@@ -1,14 +1,16 @@
 package Teemo.Teemo_backend.service;
 
-import Teemo.Teemo_backend.domain.Gender;
-import Teemo.Teemo_backend.domain.Tag;
-import Teemo.Teemo_backend.domain.Member;
+import Teemo.Teemo_backend.domain.*;
 import Teemo.Teemo_backend.domain.dtos.TagCreateRequest;
 import Teemo.Teemo_backend.domain.dtos.TagFindResponse;
 import Teemo.Teemo_backend.domain.dtos.TagSubscribeResponse;
+import Teemo.Teemo_backend.error.InvalidRangeException;
+import Teemo.Teemo_backend.error.InvalidStateException;
 import Teemo.Teemo_backend.repository.TagRepository;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.util.DateTimeParse;
+import Teemo.Teemo_backend.validator.MemberValidator;
+import Teemo.Teemo_backend.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,26 +21,32 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService{
+    private final TagValidator tagValidator;
+    private final MemberValidator memberValidator;
+
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
     @Override
     @Transactional
     public void upload(TagCreateRequest request) {
         /**
-         * [제약조건]
-         * 1. 빈 값인지 확인
-         * 2. 유효한 사용자인지 확인
-         *  2-1. 사용자의 역할이 "Viewer" 여야 한다.
-         *  2-2. 사용자에 이미 설정된 Tag 가 없어야 한다.
-         * 3. title 길이 조건 확인
-         * 4. detail 길이 조건 확인
-         * 5. maxNum 범위 조건 확인
-         * 6. upperAge 범위 조건 확인
-         * 7. lowerAge 범위 조건 확인
-         * 8. latitude 범위 조건 확인
-         * 9. longitude 범위 조건 확인
+         * [전제조건]
+         * 1. 유효한 사용자인지 확인
+         *  1-1. 사용자의 역할이 "VIEWER" 여야 한다.
+         *  1-2. 사용자에 이미 설정된 Tag 가 없어야 한다.
+         *
+         *  [체크리스트]
+         * 1. title 길이 조건 확인
+         * 2. detail 길이 조건 확인
+         * 3. maxNum 범위 조건 확인
+         * 4. upperAge 범위 조건 확인
+         * 5. lowerAge 범위 조건 확인
+         * 6. latitude 범위 조건 확인
+         * 7. longitude 범위 조건 확인
+         * 8. targetGender 상태 확인
          */
         Long memberId = request.getMemberId();
+        Member host = memberRepository.findById(memberId);
         Double latitude = request.getLatitude();
         Double longitude = request.getLongitude();
         String title = request.getTitle();
@@ -48,12 +56,42 @@ public class TagServiceImpl implements TagService{
         Integer upperAge = request.getUpperAge();
         Integer lowerAge = request.getLowerAge();
 
-        Member host = memberRepository.findById(memberId);
+        // [전제조건 1]
+        if(!memberValidator.found(host))
+            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+        // [전제조건 1-1]
+        if(!memberValidator.checkRole(host.getRole(), Role.VIEWER))
+            throw new InvalidStateException("memberId","Tag 를 게시 할 수 있는 역할이 아닙니다.");
+        // [전제조건 1-2]
+        if(memberValidator.found(host.getTag())) // 없어야 한다.
+            throw new InvalidStateException("memberId","Tag 를 게시하거나 구독 중인 사용자입니다.");
 
+        // [체크리스트 1]
+        if(!tagValidator.checkTitleLength(title.length()))
+            throw new InvalidRangeException("title","제목은 1자에서 15자 이내로 입력되어야 합니다.");
+        // [체크리스트 2]
+        if(!tagValidator.checkDetailLength(detail.length()))
+            throw new InvalidRangeException("detail","상세내용은 최대 40자까지 입력할 수 있습니다.");
+        // [체크리스트 3]
+        if(!tagValidator.checkMaxNum(maxNum))
+            throw new InvalidRangeException("maxNum","모집인원은 1에서 5 사이의 값이어야 합니다.");
+        // [체크리스트 4]
+        if(!tagValidator.checkUpperAge(upperAge,DateTimeParse.calculateAge(host.getBirthday())))
+            throw new InvalidRangeException("title","모집 나이대의 상한은 자신의 나이 이상, 100 이하여야 합니다.");
+        // [체크리스트 5]
+        if(!tagValidator.checkLowerAge(lowerAge,DateTimeParse.calculateAge(host.getBirthday())))
+            throw new InvalidRangeException("title","모집 나이대의 하한은 0 이상, 자신의 나이 이하여야 합니다.");
+        // [체크리스트 6]
+        if(!tagValidator.checkLatitude(latitude))
+            throw new InvalidRangeException("latitude","위도는 북위 33.11 이상, 북위 38.61 이하여야 합니다.");
+        // [체크리스트 7]
+        if(!tagValidator.checkLongitude(longitude))
+            throw new InvalidRangeException("longitude","경도는 동경 124.60 이상, 동경 131.87 이하여야 합니다.");
+        // [체크리스트 8]
+        if(!tagValidator.checkTargetGender(targetGender))
+            throw new InvalidStateException("targetGender","모집성별이 적절하지 않습니다.");
         Tag tag = new Tag(title,detail,maxNum,targetGender,upperAge,lowerAge,latitude,longitude,host);
         tagRepository.save(tag);
-
-
     }
 
     @Override
@@ -117,12 +155,34 @@ public class TagServiceImpl implements TagService{
          * 2. memberId로 사용자 정보를 가져온다.
          * 3. Tag 에 Guest 추가 & 연관된 사용자 정보에서 Tag 를 등록 & 연관된 사용자 정보에서 역할을 Guest 로 변경
          * 4. DTO 변환 이후 반환
+         *
+         * [전제조건]
+         * 1. 유효한 Tag 인지 확인
+         *      1-1. Db에 저장되어 있나?
+         * 2. 유효한 사용자인지 확인
+         *      2-1. Db에 저장되어 있나?
+         *      2-2. 사용자의 역할이 "VIEWER" 여야 한다.
+         *      2-3. 사용자에 이미 설정된 Tag 가 없어야 한다.
+         *
          */
-
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
         // [과정 2]
         Member member = memberRepository.findById(memberId);
+
+        // [전제조건 1-1]
+        if(!tagValidator.found(tag))
+            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+        // [전제조건 2-1]
+        if(!memberValidator.found(member))
+            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+        // [전제조건 2-2, 2-3]
+        if(!memberValidator.checkRole(member.getRole(), Role.VIEWER))
+            throw new InvalidStateException("memberId","Tag 를 구독 할 수 있는 역할이 아닙니다.");
+        // [전제조건 2-3]
+        if(memberValidator.found(member.getTag())) //  있으면 안되는 거다.
+            throw new InvalidStateException("memberId","Tag 를 게시하거나 이미 구독 중인 사용자입니다.");
+
         // [과정 3]
         tag.addGuest(member);
         //[과정 4]
@@ -134,44 +194,93 @@ public class TagServiceImpl implements TagService{
     @Transactional
     public void unsubscribe(Long memberId, Long tagId) {
         /**
+         * [전제조건]
+         * 1. 유효한 Tag 인지 확인
+         *      1-1. Db에 저장되어 있나?
+         * 2. 유효한 사용자인지 확인
+         *      2-1. Db에 저장되어 있나?
+         *      2-2. 사용자의 역할이 "GUEST" 여야 한다.
+         *      2-3. 사용자에 이미 설정된 Tag 가 있어야 한다.
+         *
          * [과정]
          * 1. tagId로 Tag 정보를 가져온다.
          * 2. memberId로 사용자 정보를 가져온다.
          * 3. Tag 에 Guest 제거 & 연관된 사용자 정보에서 Tag 를 해제 & 연관된 사용자 정보에서 역할을 GUEST 로 변경
-         * 4. 만약 host 와의 Chatroom 이 있다면, 해당 Chatroom 을 삭제해준다.
+         * 4. 만약 Host 와의 채팅이 있다면, 해당 채팅방을 제거한다.
+         *
          */
 
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
         // [과정 2]
         Member member = memberRepository.findById(memberId);
+
+        // [전제조건 1-1]
+        if(!tagValidator.found(tag))
+            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+        // [전제조건 2-1]
+        if(!memberValidator.found(member))
+            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+        // [전제조건 2-2]
+        if(!memberValidator.checkRole(member.getRole(), Role.GUEST))
+            throw new InvalidStateException("memberId","Tag 를 구독 해제 할 수 있는 역할이 아닙니다.");
+        // [전제조건 2-3]
+        if(!memberValidator.found(member.getTag())) // 없으면 안된다.
+            throw new InvalidStateException("memberId","구독 해제 할 Tag 가 없습니다.");
+
+
         // [과정 3]
         tag.removeGuest(member);
         // [과정 4]
-        // 추후에 구현
+        if(member.getChatroom() != null){
+            tag.removeChatroom(member.getChatroom());
+        }
     }
 
     @Override
     @Transactional
     public void remove(Long memberId, Long tagId) {
         /**
+         * [전제조건]
+         * 1. 유효한 Tag 인지 확인
+         *      1-1. Db에 저장되어 있나?
+         * 2. 유효한 사용자인지 확인
+         *      2-1. Db에 저장되어 있나?
+         *      2-2. 사용자의 역할이 "HOST" 여야 한다.
+         *      2-3. 사용자에 이미 설정된 Tag 가 있어야 한다.
+         *
          * [과정]
          * 1. tagId로 Tag 정보를 가져온다.
          * 2. memberId로 사용자 정보를 가져온다.
          * 3. Tag 에서 모든 사용자 정보 제거 & 연관된 사용자 정보에서 Tag 를 해제 & 연관된 사용자 정보에서 역할을 GUEST 로 변경
-         * 4. tag 를 제거한다.
+         * 4. Tag 에서 모든 채팅방 정보 제거 & 제거되는 채팅방과 연관된 사용자 정보에서 채팅방과의 매핑 해제
+         * 5. tag 를 제거한다.
          *
-         * [제약조건]
-         * Tag 에 저장된 호스트 정보와 memberId 로 찾은 사용자의 정보가 일치하는 지 확인한다.
          */
 
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
         // [과정 2]
         Member member = memberRepository.findById(memberId);
+
+        // [전제조건 1-1]
+        if(!tagValidator.found(tag))
+            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+        // [전제조건 2-1]
+        if(!memberValidator.found(member))
+            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+        // [전제조건 2-2]
+        if(!memberValidator.checkRole(member.getRole(), Role.HOST))
+            throw new InvalidStateException("memberId","Tag 를 삭제 할 수 있는 역할이 아닙니다.");
+        // [전제조건 2-3]
+        if(!memberValidator.found(member.getTag())) // 없으면 안된다.
+            throw new InvalidStateException("memberId","삭제 할 Tag 가 없습니다.");
+
         // [과정 3]
         tag.removeAllMembers();
         // [과정 4]
+        tag.removeAllChatrooms();
+        // [과정 5]
         tagRepository.delete(tag);
     }
 }
