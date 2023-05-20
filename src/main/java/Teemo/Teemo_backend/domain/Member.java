@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -77,4 +75,11 @@ public class Member {
     }
     public void setChatroom(Chatroom chatroom){this.chatroom = chatroom;}
     public void unsetChatroom(){this.chatroom = null;}
+
+    @Override
+    public boolean equals(Object o) {
+        if(o==null) return false;
+        Member member = (Member)o;
+        return (this.id).equals(member.getId());
+    }
 }
