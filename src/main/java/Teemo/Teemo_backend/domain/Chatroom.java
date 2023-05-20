@@ -63,4 +63,10 @@ public class Chatroom {
     public void removeTag(){ // Tag 와의 연관관계 해제
         this.tag = null;
     }
+    @Override
+    public boolean equals(Object o) {
+        if(o==null) return false;
+        Chatroom chatroom = (Chatroom)o;
+        return (this.id).equals(chatroom.getId());
+    }
 }
