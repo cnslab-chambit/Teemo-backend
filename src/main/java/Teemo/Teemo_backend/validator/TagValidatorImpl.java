@@ -19,11 +19,6 @@ public class TagValidatorImpl implements TagValidator {
     private final int MinLowerAge = 0;
 
     @Override
-    public boolean found(Object found) {
-        if(found!=null) return true;
-        return false;
-    }
-    @Override
     public boolean checkLatitude(Double latitude){
         if(MinLatitude<=latitude && latitude <= MaxLatitude) return true;
         return false;
