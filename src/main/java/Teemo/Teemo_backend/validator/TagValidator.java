@@ -4,7 +4,6 @@ import Teemo.Teemo_backend.domain.Gender;
 import Teemo.Teemo_backend.domain.Tag;
 
 public interface TagValidator {
-    public boolean found(Object found);
     boolean checkLatitude(Double latitude);
     boolean checkLongitude(Double longitude);
     boolean checkTitleLength(Integer titleLength);

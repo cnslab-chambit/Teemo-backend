@@ -9,6 +9,7 @@ import Teemo.Teemo_backend.error.InvalidStateException;
 import Teemo.Teemo_backend.repository.TagRepository;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.util.DateTimeParse;
+import Teemo.Teemo_backend.validator.CommonValidator;
 import Teemo.Teemo_backend.validator.MemberValidator;
 import Teemo.Teemo_backend.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.List;
 public class TagServiceImpl implements TagService{
     private final TagValidator tagValidator;
     private final MemberValidator memberValidator;
+    private final CommonValidator commonValidator;
 
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
@@ -57,13 +59,13 @@ public class TagServiceImpl implements TagService{
         Integer lowerAge = request.getLowerAge();
 
         // [전제조건 1]
-        if(!memberValidator.found(host))
+        if(!commonValidator.found(host))
             throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 1-1]
         if(!memberValidator.checkRole(host.getRole(), Role.VIEWER))
             throw new InvalidStateException("memberId","Tag 를 게시 할 수 있는 역할이 아닙니다.");
         // [전제조건 1-2]
-        if(memberValidator.found(host.getTag())) // 없어야 한다.
+        if(commonValidator.found(host.getTag())) // 없어야 한다.
             throw new InvalidStateException("memberId","Tag 를 게시하거나 구독 중인 사용자입니다.");
 
         // [체크리스트 1]
@@ -97,16 +99,45 @@ public class TagServiceImpl implements TagService{
     @Override
     public List<Tag> search(Long memberId, Double latitude, Double longitude) {
         /**
+         * [전제조건]
+         * 1. 유효한 사용자인지 확인
+         *  1-1. 사용자의 역할이 "VIEWER" 여야 한다.
+         *  1-2. 사용자에 이미 설정된 Tag 가 없어야 한다.
+         *
+         *  [체크리스트]
+         * 1. latitude 범위 조건 확인
+         * 2. longitude 범위 조건 확인
+         *
          * [과정]
          * 1. memberId 로 조회자을 찾는다.
          * 2. 조회자의 성별, 나이를 찾는다.
          * 3. 나이, 위도, 경도 조건에 맞는 Tag 를 찾는다.
-         * 4. 성별 조건을 검사(Tag 의 성별조건이 조회자의 성별과 일치하거나, Tag 의 성별조건이 'N')
          */
 
+        // [체크리스트 1]
+        if(!tagValidator.checkLatitude(latitude))
+            throw new InvalidRangeException("latitude","위도는 북위 33.11 이상, 북위 38.61 이하여야 합니다.");
+        // [체크리스트 2]
+        if(!tagValidator.checkLongitude(longitude))
+            throw new InvalidRangeException("longitude","경도는 동경 124.60 이상, 동경 131.87 이하여야 합니다.");
+
+        // [과정 1]
         Member member = memberRepository.findById(memberId);
+
+        // [전제조건 1]
+        if(!commonValidator.found(member))
+            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+        // [전제조건 1-1]
+        if(!memberValidator.checkRole(member.getRole(), Role.VIEWER))
+            throw new InvalidStateException("memberId","Tag 를 게시 할 수 있는 역할이 아닙니다.");
+        // [전제조건 1-2]
+        if(commonValidator.found(member.getTag())) // 없어야 한다.
+            throw new InvalidStateException("memberId","Tag 를 게시하거나 구독 중인 사용자입니다.");
+
+        // [과정 2]
         Gender gender = member.getGender();
         Integer age = DateTimeParse.calculateAge(member.getBirthday());
+        // [과정 3]
         List<Tag> findTags = tagRepository.findByCriteria(latitude, longitude, age, gender);
         return findTags;
     }
@@ -114,6 +145,10 @@ public class TagServiceImpl implements TagService{
     @Override
     public TagFindResponse find(Long tagId) {
         /**
+         * [전제조건]
+         * 1. 유효한 Tag 인지 확인
+         *      1-1. Db에 저장되어 있나?
+         *
          * [과정]
          * 1. tagId로 tag 을 찾는다.
          * 2. tag 의 host 를 검색 후 host 정보 추출.
@@ -122,6 +157,10 @@ public class TagServiceImpl implements TagService{
 
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
+
+        // [전제조건 1-1]
+        if(!commonValidator.found(tag))
+            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
 
         // [과정 2]
         List<Member> members = tag.getMembers();
@@ -150,12 +189,6 @@ public class TagServiceImpl implements TagService{
     @Transactional
     public TagSubscribeResponse subscribe(Long memberId, Long tagId) {
         /**
-         * [과정]
-         * 1. tagId로 Tag 정보를 가져온다.
-         * 2. memberId로 사용자 정보를 가져온다.
-         * 3. Tag 에 Guest 추가 & 연관된 사용자 정보에서 Tag 를 등록 & 연관된 사용자 정보에서 역할을 Guest 로 변경
-         * 4. DTO 변환 이후 반환
-         *
          * [전제조건]
          * 1. 유효한 Tag 인지 확인
          *      1-1. Db에 저장되어 있나?
@@ -164,6 +197,12 @@ public class TagServiceImpl implements TagService{
          *      2-2. 사용자의 역할이 "VIEWER" 여야 한다.
          *      2-3. 사용자에 이미 설정된 Tag 가 없어야 한다.
          *
+         * [과정]
+         * 1. tagId로 Tag 정보를 가져온다.
+         * 2. memberId로 사용자 정보를 가져온다.
+         * 3. Tag 에 Guest 추가 & 연관된 사용자 정보에서 Tag 를 등록 & 연관된 사용자 정보에서 역할을 Guest 로 변경
+         * 4. DTO 변환 이후 반환
+         *
          */
         // [과정 1]
         Tag tag = tagRepository.findById(tagId);
@@ -171,16 +210,16 @@ public class TagServiceImpl implements TagService{
         Member member = memberRepository.findById(memberId);
 
         // [전제조건 1-1]
-        if(!tagValidator.found(tag))
+        if(!commonValidator.found(tag))
             throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
-        if(!memberValidator.found(member))
+        if(!commonValidator.found(member))
             throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 2-2, 2-3]
         if(!memberValidator.checkRole(member.getRole(), Role.VIEWER))
             throw new InvalidStateException("memberId","Tag 를 구독 할 수 있는 역할이 아닙니다.");
         // [전제조건 2-3]
-        if(memberValidator.found(member.getTag())) //  있으면 안되는 거다.
+        if(commonValidator.found(member.getTag())) //  있으면 안되는 거다.
             throw new InvalidStateException("memberId","Tag 를 게시하거나 이미 구독 중인 사용자입니다.");
 
         // [과정 3]
@@ -216,16 +255,16 @@ public class TagServiceImpl implements TagService{
         Member member = memberRepository.findById(memberId);
 
         // [전제조건 1-1]
-        if(!tagValidator.found(tag))
+        if(!commonValidator.found(tag))
             throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
-        if(!memberValidator.found(member))
+        if(!commonValidator.found(member))
             throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 2-2]
         if(!memberValidator.checkRole(member.getRole(), Role.GUEST))
             throw new InvalidStateException("memberId","Tag 를 구독 해제 할 수 있는 역할이 아닙니다.");
         // [전제조건 2-3]
-        if(!memberValidator.found(member.getTag())) // 없으면 안된다.
+        if(!commonValidator.found(member.getTag())) // 있어야한다.
             throw new InvalidStateException("memberId","구독 해제 할 Tag 가 없습니다.");
 
 
@@ -264,16 +303,16 @@ public class TagServiceImpl implements TagService{
         Member member = memberRepository.findById(memberId);
 
         // [전제조건 1-1]
-        if(!tagValidator.found(tag))
+        if(!commonValidator.found(tag))
             throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
-        if(!memberValidator.found(member))
+        if(!commonValidator.found(member))
             throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 2-2]
         if(!memberValidator.checkRole(member.getRole(), Role.HOST))
             throw new InvalidStateException("memberId","Tag 를 삭제 할 수 있는 역할이 아닙니다.");
         // [전제조건 2-3]
-        if(!memberValidator.found(member.getTag())) // 없으면 안된다.
+        if(!commonValidator.found(member.getTag())) // 있어야 한다.
             throw new InvalidStateException("memberId","삭제 할 Tag 가 없습니다.");
 
         // [과정 3]
