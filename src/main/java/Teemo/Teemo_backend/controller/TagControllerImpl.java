@@ -138,14 +138,6 @@ public class TagControllerImpl {
         }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
-
-    private static ResponseEntity<Map<String, Object>> getMapResponseEntity(String error,String field) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("status", "error");
-        errorResponse.put("message", error);
-        errorResponse.put("invalid field", field);
-        return ResponseEntity.badRequest().body(errorResponse);
-    }
 }
 
 
