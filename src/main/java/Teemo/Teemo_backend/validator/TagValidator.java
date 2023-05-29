@@ -2,6 +2,8 @@ package Teemo.Teemo_backend.validator;
 
 import Teemo.Teemo_backend.domain.Gender;
 
+import java.time.LocalDateTime;
+
 public interface TagValidator {
     boolean checkLatitude(Double latitude);
     boolean checkLongitude(Double longitude);
@@ -11,4 +13,5 @@ public interface TagValidator {
     boolean checkTargetGender(Gender targetGender);
     boolean compareUpperAge(Integer upperAge, Integer memberAge);
     boolean compareLowerAge(Integer lowerAge, Integer memberAge);
+    boolean checkDeadLine(LocalDateTime now, LocalDateTime deletedAt);
 }
