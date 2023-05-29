@@ -26,13 +26,13 @@ public class ChatroomControllerImpl {
      * @output  :   chatroomId,nickname,age,gender,title
      */
     @PostMapping("/create")
-    public ChatroomSearchResponse createChatroom(@RequestBody ChatroomCreateRequest request){
+    public ResponseEntity<ChatroomSearchResponse> createChatroom(@RequestBody ChatroomCreateRequest request){
         log.info("memberId: "+request.getMemberId());
         log.info("tatId: "+request.getTagId());
         log.info("latitude: "+ request.getLatitude());
         log.info("longitude: "+request.getLongitude());
         ChatroomSearchResponse response = chatroomService.create(request);
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -42,12 +42,12 @@ public class ChatroomControllerImpl {
      * @output  :   [ {chatroomId,nickname,age,gender,title},....,{chatroomId,nickname,age,gender,title} ]
      */
     @GetMapping("/search")
-    public List<ChatroomSearchResponse> searchChatroom(
+    public ResponseEntity<List<ChatroomSearchResponse>> searchChatroom(
             @RequestParam Long memberId,
             @RequestParam Long tagId
     ){
         List<ChatroomSearchResponse> responses = chatroomService.search(memberId, tagId);
-        return responses;
+        return ResponseEntity.ok(responses);
     }
 
     /**
@@ -57,9 +57,9 @@ public class ChatroomControllerImpl {
      * @output  : [{chatId, nickname, msg} , ... , {chatId, nickname, msg}]
      */
     @GetMapping("/enter")
-    public List<Chat> enterChatroom(@RequestParam Long chatroomId){
+    public ResponseEntity<List<Chat>> enterChatroom(@RequestParam Long chatroomId){
         List<Chat> response = chatroomService.load(chatroomId);
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     /**
