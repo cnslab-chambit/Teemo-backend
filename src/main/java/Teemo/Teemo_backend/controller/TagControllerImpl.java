@@ -2,6 +2,7 @@ package Teemo.Teemo_backend.controller;
 
 import Teemo.Teemo_backend.domain.Tag;
 import Teemo.Teemo_backend.domain.dtos.*;
+import Teemo.Teemo_backend.error.CustomErrorResponse;
 import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.service.TagService;
 import jakarta.validation.Valid;
@@ -32,8 +33,9 @@ public class TagControllerImpl {
         try {
             tagService.upload(request);
         }
-        catch (CustomInvalidValueException e){
-            return getMapResponseEntity("InvalidRangeException",e.getField());
+        catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }
@@ -51,7 +53,13 @@ public class TagControllerImpl {
             @RequestParam("longitude") Double longitude
     )
     {
-        List<Tag> list = tagService.search(memberId,latitude,longitude);
+        List<Tag> list = null;
+        try {
+            list = tagService.search(memberId, latitude, longitude);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         List<TagSearchResponse> responses = new ArrayList<>();
         for(Tag tag: list){
             responses.add(new TagSearchResponse(tag.getId(),tag.getLatitude(),tag.getLongitude()));
@@ -68,7 +76,14 @@ public class TagControllerImpl {
     @GetMapping("/find/{tagId}")
     public ResponseEntity<TagFindResponse> findTag(@PathVariable Long tagId)
     {
-        return ResponseEntity.ok(tagService.find(tagId));
+        TagFindResponse response = null;
+        try{
+            response = tagService.find(tagId);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(response);
     }
 
 
@@ -80,7 +95,13 @@ public class TagControllerImpl {
      */
     @PostMapping("/subscribe")
     public ResponseEntity<TagSubscribeResponse> subscribeTag(@RequestBody TagCommonRequest request){
-        TagSubscribeResponse response = tagService.subscribe(request.getMemberId(),request.getTagId());
+        TagSubscribeResponse response = null;
+        try {
+            response = tagService.subscribe(request.getMemberId(), request.getTagId());
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -92,7 +113,12 @@ public class TagControllerImpl {
      */
     @PostMapping("/unsubscribe")
     public ResponseEntity unsubscribeTag(@RequestBody TagCommonRequest request){
-        tagService.unsubscribe(request.getMemberId(),request.getTagId());
+        try {
+            tagService.unsubscribe(request.getMemberId(), request.getTagId());
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -104,7 +130,12 @@ public class TagControllerImpl {
      */
     @DeleteMapping("/delete")
     public ResponseEntity deleteTag(@RequestBody TagCommonRequest request){
-        tagService.remove(request.getMemberId(),request.getTagId());
+        try {
+            tagService.remove(request.getMemberId(), request.getTagId());
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
