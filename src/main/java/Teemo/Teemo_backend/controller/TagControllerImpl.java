@@ -45,7 +45,7 @@ public class TagControllerImpl {
      * @output  : [ {tagId,latitude,longitude},{tagId,latitude,longitude},....,{tagId,latitude,longitude} ]
      */
     @GetMapping("/search")
-    public List<TagSearchResponse> searchTags(
+    public ResponseEntity<List<TagSearchResponse>> searchTags(
             @RequestParam("memberId") Long memberId,
             @RequestParam("latitude") Double latitude,
             @RequestParam("longitude") Double longitude
@@ -56,7 +56,7 @@ public class TagControllerImpl {
         for(Tag tag: list){
             responses.add(new TagSearchResponse(tag.getId(),tag.getLatitude(),tag.getLongitude()));
         }
-        return responses;
+        return ResponseEntity.ok(responses);
     }
 
     /**
@@ -66,9 +66,9 @@ public class TagControllerImpl {
      * @output  : tagId, title, maxNum, targetGender, upperAge, lowerAge, remainingTime, hostNickName, hostGender, hostAge
      */
     @GetMapping("/find/{tagId}")
-    public TagFindResponse findTag(@PathVariable Long tagId)
+    public ResponseEntity<TagFindResponse> findTag(@PathVariable Long tagId)
     {
-        return tagService.find(tagId);
+        return ResponseEntity.ok(tagService.find(tagId));
     }
 
 
@@ -79,9 +79,9 @@ public class TagControllerImpl {
      * @output  : tagId, latitude, longitude
      */
     @PostMapping("/subscribe")
-    public TagSubscribeResponse subscribeTag(@RequestBody TagCommonRequest request){
+    public ResponseEntity<TagSubscribeResponse> subscribeTag(@RequestBody TagCommonRequest request){
         TagSubscribeResponse response = tagService.subscribe(request.getMemberId(),request.getTagId());
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     /**
