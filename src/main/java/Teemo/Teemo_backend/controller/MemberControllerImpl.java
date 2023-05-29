@@ -1,9 +1,8 @@
 package Teemo.Teemo_backend.controller;
 
 import Teemo.Teemo_backend.domain.Member;
-import Teemo.Teemo_backend.domain.dtos.MemberFindResponse;
-import Teemo.Teemo_backend.domain.dtos.MemberSignupRequest;
-import Teemo.Teemo_backend.domain.dtos.MemberUpdateRequest;
+import Teemo.Teemo_backend.domain.dtos.*;
+import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
-public class MemberControllerImpl {
+public class MemberControllerImpl implements MemberController{
     private final MemberRepository memberRepository;
     private final MemberService memberService;
 
@@ -27,7 +26,7 @@ public class MemberControllerImpl {
     {   try {
             memberService.join(request);
         }
-        catch (Exception e) {}
+        catch (CustomInvalidValueException e) {}
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
@@ -75,6 +74,28 @@ public class MemberControllerImpl {
         try {
             memberService.remove(memberId);
         }catch(Exception e){}
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    /**
+     * 회원 접속 (로그인)
+     */
+    @PostMapping("/login")
+    public MemberLoginResponse login(MemberLoginRequest request){
+        Member member = null;
+        try{
+            member = memberService.login(request);
+        }catch(Exception e){}
+        MemberLoginResponse response = new MemberLoginResponse(member.getId(),member.getRole());
+        return response;
+    }
+
+    /**
+     * 회원 접속해제 (로그아웃)
+     */
+    @GetMapping("/logout/{memberId}")
+    public ResponseEntity logout(@PathVariable Long memberId){
+        memberService.logout(memberId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
