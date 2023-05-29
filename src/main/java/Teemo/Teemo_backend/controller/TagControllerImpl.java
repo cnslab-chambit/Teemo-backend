@@ -19,7 +19,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/tags")
 @RequiredArgsConstructor
-public class TagController {
+public class TagControllerImpl {
     private final TagService tagService;
     /**
      * 태그 생성

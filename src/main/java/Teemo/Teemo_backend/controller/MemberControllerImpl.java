@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
-public class MemberController {
+public class MemberControllerImpl {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
 
@@ -30,6 +30,7 @@ public class MemberController {
         catch (Exception e) {}
         return new ResponseEntity(HttpStatus.CREATED);
     }
+
 
     /**
      * 자기 정보 조회
