@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -107,6 +109,7 @@ public class TagServiceImpl implements TagService{
          *  [체크리스트]
          * 1. latitude 범위 조건 확인
          * 2. longitude 범위 조건 확인
+         * 3. DeadLine 을 넘은 tag 는 삭제한다.
          *
          * [과정]
          * 1. memberId 로 조회자을 찾는다.
@@ -139,6 +142,19 @@ public class TagServiceImpl implements TagService{
         Integer age = DateTimeParse.calculateAge(member.getBirthday());
         // [과정 3]
         List<Tag> findTags = tagRepository.findByCriteria(latitude, longitude, age, gender);
+
+        // [체크리스트 3]
+        LocalDateTime now = LocalDateTime.now();
+        Iterator<Tag> iterator = findTags.iterator();
+        while (iterator.hasNext()) {
+            Tag findTag = iterator.next();
+            if (!tagValidator.checkDeadLine(now, findTag.getDeletedAt())) {
+                removeMappingConnections(findTag);
+                tagRepository.delete(findTag);
+                iterator.remove(); // 리스트에서 해당 태그를 삭제
+            }
+        }
+
         return findTags;
     }
 
@@ -148,6 +164,7 @@ public class TagServiceImpl implements TagService{
          * [전제조건]
          * 1. 유효한 Tag 인지 확인
          *      1-1. Db에 저장되어 있나?
+         * 2. DeadLine 준수하였는지?
          *
          * [과정]
          * 1. tagId로 tag 을 찾는다.
@@ -161,6 +178,13 @@ public class TagServiceImpl implements TagService{
         // [전제조건 1-1]
         if(!commonValidator.found(tag))
             throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+        // [전제조건 2]
+        if(!tagValidator.checkDeadLine(LocalDateTime.now(),tag.getDeletedAt())) {
+            // 유효기간이 지난 Tag는 삭제하고, 클라이언트에게 삭되었다고 반환.
+            removeMappingConnections(tag);
+            tagRepository.delete(tag);
+            throw new InvalidStateException("tagId", "삭제된 Tag 입니다.");
+        }
 
         // [과정 2]
         List<Member> members = tag.getMembers();
@@ -315,11 +339,15 @@ public class TagServiceImpl implements TagService{
         if(!commonValidator.found(member.getTag())) // 있어야 한다.
             throw new InvalidStateException("memberId","삭제 할 Tag 가 없습니다.");
 
-        // [과정 3]
-        tag.removeAllMembers();
-        // [과정 4]
-        tag.removeAllChatrooms();
+        // [과정 3, 4]
+        removeMappingConnections(tag);
         // [과정 5]
         tagRepository.delete(tag);
+    }
+
+
+    public void removeMappingConnections(Tag tag){
+        tag.removeAllMembers();
+        tag.removeAllChatrooms();
     }
 }
