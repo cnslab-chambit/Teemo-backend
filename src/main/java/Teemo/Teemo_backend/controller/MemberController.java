@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 
 public interface MemberController {
     public ResponseEntity signup(MemberSignupRequest request);
-    public MemberFindResponse findMember(Long memberId);
+    public ResponseEntity<MemberFindResponse> findMember(Long memberId);
     public ResponseEntity updateMember(MemberUpdateRequest request);
     public ResponseEntity deleteMember(Long memberId);
-    public MemberLoginResponse login(MemberLoginRequest request);
+    public ResponseEntity<MemberLoginResponse> login(MemberLoginRequest request);
     public ResponseEntity logout(Long memberId);
 }

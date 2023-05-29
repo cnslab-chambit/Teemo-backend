@@ -2,6 +2,7 @@ package Teemo.Teemo_backend.controller;
 
 import Teemo.Teemo_backend.domain.Member;
 import Teemo.Teemo_backend.domain.dtos.*;
+import Teemo.Teemo_backend.error.CustomErrorResponse;
 import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.service.MemberService;
@@ -26,7 +27,10 @@ public class MemberControllerImpl implements MemberController{
     {   try {
             memberService.join(request);
         }
-        catch (CustomInvalidValueException e) {}
+        catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
@@ -35,14 +39,12 @@ public class MemberControllerImpl implements MemberController{
      * 자기 정보 조회
      */
     @GetMapping("/find")
-    public MemberFindResponse findMember(@RequestParam Long memberId){
+    public ResponseEntity<MemberFindResponse> findMember(@RequestParam Long memberId){
         Member member = null;
         try{
             member = memberService.find(memberId);
         }
-        catch (Exception e){}
-
-
+        catch (Exception e) {}
         MemberFindResponse response = new MemberFindResponse(
                 member.getEmail(),
                 member.getPassword(),
@@ -52,7 +54,7 @@ public class MemberControllerImpl implements MemberController{
                 member.getCreatedAt(),
                 member.getDeletedAt()
         );
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -81,13 +83,13 @@ public class MemberControllerImpl implements MemberController{
      * 회원 접속 (로그인)
      */
     @PostMapping("/login")
-    public MemberLoginResponse login(MemberLoginRequest request){
+    public ResponseEntity<MemberLoginResponse> login(MemberLoginRequest request){
         Member member = null;
         try{
             member = memberService.login(request);
         }catch(Exception e){}
         MemberLoginResponse response = new MemberLoginResponse(member.getId(),member.getRole());
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     /**
