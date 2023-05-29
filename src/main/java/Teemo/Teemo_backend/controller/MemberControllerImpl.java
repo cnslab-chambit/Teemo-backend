@@ -44,7 +44,10 @@ public class MemberControllerImpl implements MemberController{
         try{
             member = memberService.find(memberId);
         }
-        catch (Exception e) {}
+        catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         MemberFindResponse response = new MemberFindResponse(
                 member.getEmail(),
                 member.getPassword(),
@@ -64,7 +67,10 @@ public class MemberControllerImpl implements MemberController{
     public ResponseEntity updateMember(@RequestBody MemberUpdateRequest request){
         try {
             memberService.update(request);
-        }catch (Exception e){}
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -75,7 +81,10 @@ public class MemberControllerImpl implements MemberController{
     public ResponseEntity deleteMember(@PathVariable Long memberId){
         try {
             memberService.remove(memberId);
-        }catch(Exception e){}
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -87,7 +96,10 @@ public class MemberControllerImpl implements MemberController{
         Member member = null;
         try{
             member = memberService.login(request);
-        }catch(Exception e){}
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         MemberLoginResponse response = new MemberLoginResponse(member.getId(),member.getRole());
         return ResponseEntity.ok(response);
     }
@@ -97,7 +109,12 @@ public class MemberControllerImpl implements MemberController{
      */
     @GetMapping("/logout/{memberId}")
     public ResponseEntity logout(@PathVariable Long memberId){
-        memberService.logout(memberId);
+        try {
+            memberService.logout(memberId);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 
