@@ -2,8 +2,8 @@ package Teemo.Teemo_backend.controller;
 
 import Teemo.Teemo_backend.domain.Tag;
 import Teemo.Teemo_backend.domain.dtos.*;
-import Teemo.Teemo_backend.error.InvalidRangeException;
-import Teemo.Teemo_backend.error.InvalidStateException;
+import Teemo.Teemo_backend.error.CustomErrorResponse;
+import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.service.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/tags")
 @RequiredArgsConstructor
-public class TagController {
+public class TagControllerImpl {
     private final TagService tagService;
     /**
      * 태그 생성
@@ -33,10 +33,9 @@ public class TagController {
         try {
             tagService.upload(request);
         }
-        catch (InvalidRangeException e){
-            return getMapResponseEntity("InvalidRangeException",e.getField());
-        }catch (InvalidStateException e){
-            return getMapResponseEntity("InvalidStateException",e.getField());
+        catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }
@@ -48,18 +47,24 @@ public class TagController {
      * @output  : [ {tagId,latitude,longitude},{tagId,latitude,longitude},....,{tagId,latitude,longitude} ]
      */
     @GetMapping("/search")
-    public List<TagSearchResponse> searchTags(
+    public ResponseEntity<List<TagSearchResponse>> searchTags(
             @RequestParam("memberId") Long memberId,
             @RequestParam("latitude") Double latitude,
             @RequestParam("longitude") Double longitude
     )
     {
-        List<Tag> list = tagService.search(memberId,latitude,longitude);
+        List<Tag> list = null;
+        try {
+            list = tagService.search(memberId, latitude, longitude);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         List<TagSearchResponse> responses = new ArrayList<>();
         for(Tag tag: list){
             responses.add(new TagSearchResponse(tag.getId(),tag.getLatitude(),tag.getLongitude()));
         }
-        return responses;
+        return ResponseEntity.ok(responses);
     }
 
     /**
@@ -69,9 +74,16 @@ public class TagController {
      * @output  : tagId, title, maxNum, targetGender, upperAge, lowerAge, remainingTime, hostNickName, hostGender, hostAge
      */
     @GetMapping("/find/{tagId}")
-    public TagFindResponse findTag(@PathVariable Long tagId)
+    public ResponseEntity<TagFindResponse> findTag(@PathVariable Long tagId)
     {
-        return tagService.find(tagId);
+        TagFindResponse response = null;
+        try{
+            response = tagService.find(tagId);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(response);
     }
 
 
@@ -82,9 +94,15 @@ public class TagController {
      * @output  : tagId, latitude, longitude
      */
     @PostMapping("/subscribe")
-    public TagSubscribeResponse subscribeTag(@RequestBody TagCommonRequest request){
-        TagSubscribeResponse response = tagService.subscribe(request.getMemberId(),request.getTagId());
-        return response;
+    public ResponseEntity<TagSubscribeResponse> subscribeTag(@RequestBody TagCommonRequest request){
+        TagSubscribeResponse response = null;
+        try {
+            response = tagService.subscribe(request.getMemberId(), request.getTagId());
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -95,7 +113,12 @@ public class TagController {
      */
     @PostMapping("/unsubscribe")
     public ResponseEntity unsubscribeTag(@RequestBody TagCommonRequest request){
-        tagService.unsubscribe(request.getMemberId(),request.getTagId());
+        try {
+            tagService.unsubscribe(request.getMemberId(), request.getTagId());
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -107,16 +130,13 @@ public class TagController {
      */
     @DeleteMapping("/delete")
     public ResponseEntity deleteTag(@RequestBody TagCommonRequest request){
-        tagService.remove(request.getMemberId(),request.getTagId());
+        try {
+            tagService.remove(request.getMemberId(), request.getTagId());
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-
-    private static ResponseEntity<Map<String, Object>> getMapResponseEntity(String error,String field) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("status", "error");
-        errorResponse.put("message", error);
-        errorResponse.put("invalid field", field);
-        return ResponseEntity.badRequest().body(errorResponse);
     }
 }
 

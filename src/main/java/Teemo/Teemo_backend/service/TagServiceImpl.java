@@ -4,8 +4,7 @@ import Teemo.Teemo_backend.domain.*;
 import Teemo.Teemo_backend.domain.dtos.TagCreateRequest;
 import Teemo.Teemo_backend.domain.dtos.TagFindResponse;
 import Teemo.Teemo_backend.domain.dtos.TagSubscribeResponse;
-import Teemo.Teemo_backend.error.InvalidRangeException;
-import Teemo.Teemo_backend.error.InvalidStateException;
+import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.repository.TagRepository;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.util.DateTimeParse;
@@ -16,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -60,38 +61,38 @@ public class TagServiceImpl implements TagService{
 
         // [전제조건 1]
         if(!commonValidator.found(host))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 1-1]
         if(!memberValidator.checkRole(host.getRole(), Role.VIEWER))
-            throw new InvalidStateException("memberId","Tag 를 게시 할 수 있는 역할이 아닙니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 게시 할 수 있는 역할이 아닙니다.");
         // [전제조건 1-2]
         if(commonValidator.found(host.getTag())) // 없어야 한다.
-            throw new InvalidStateException("memberId","Tag 를 게시하거나 구독 중인 사용자입니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 게시하거나 구독 중인 사용자입니다.");
 
         // [체크리스트 1]
         if(!tagValidator.checkTitleLength(title.length()))
-            throw new InvalidRangeException("title","제목은 1자에서 15자 이내로 입력되어야 합니다.");
+            throw new CustomInvalidValueException("title","제목은 1자에서 15자 이내로 입력되어야 합니다.");
         // [체크리스트 2]
         if(!tagValidator.checkDetailLength(detail.length()))
-            throw new InvalidRangeException("detail","상세내용은 최대 40자까지 입력할 수 있습니다.");
+            throw new CustomInvalidValueException("detail","상세내용은 최대 40자까지 입력할 수 있습니다.");
         // [체크리스트 3]
         if(!tagValidator.checkMaxNum(maxNum))
-            throw new InvalidRangeException("maxNum","모집인원은 1에서 5 사이의 값이어야 합니다.");
+            throw new CustomInvalidValueException("maxNum","모집인원은 1에서 5 사이의 값이어야 합니다.");
         // [체크리스트 4]
-        if(!tagValidator.checkUpperAge(upperAge,DateTimeParse.calculateAge(host.getBirthday())))
-            throw new InvalidRangeException("title","모집 나이대의 상한은 자신의 나이 이상, 100 이하여야 합니다.");
+        if(!tagValidator.compareUpperAge(upperAge,DateTimeParse.calculateAge(host.getBirthday())))
+            throw new CustomInvalidValueException("title","모집 나이대의 상한은 자신의 나이 이상, 100 이하여야 합니다.");
         // [체크리스트 5]
-        if(!tagValidator.checkLowerAge(lowerAge,DateTimeParse.calculateAge(host.getBirthday())))
-            throw new InvalidRangeException("title","모집 나이대의 하한은 0 이상, 자신의 나이 이하여야 합니다.");
+        if(!tagValidator.compareLowerAge(lowerAge,DateTimeParse.calculateAge(host.getBirthday())))
+            throw new CustomInvalidValueException("title","모집 나이대의 하한은 0 이상, 자신의 나이 이하여야 합니다.");
         // [체크리스트 6]
         if(!tagValidator.checkLatitude(latitude))
-            throw new InvalidRangeException("latitude","위도는 북위 33.11 이상, 북위 38.61 이하여야 합니다.");
+            throw new CustomInvalidValueException("latitude","위도는 북위 33.11 이상, 북위 38.61 이하여야 합니다.");
         // [체크리스트 7]
         if(!tagValidator.checkLongitude(longitude))
-            throw new InvalidRangeException("longitude","경도는 동경 124.60 이상, 동경 131.87 이하여야 합니다.");
+            throw new CustomInvalidValueException("longitude","경도는 동경 124.60 이상, 동경 131.87 이하여야 합니다.");
         // [체크리스트 8]
         if(!tagValidator.checkTargetGender(targetGender))
-            throw new InvalidStateException("targetGender","모집성별이 적절하지 않습니다.");
+            throw new CustomInvalidValueException("targetGender","모집성별이 적절하지 않습니다.");
         Tag tag = new Tag(title,detail,maxNum,targetGender,upperAge,lowerAge,latitude,longitude,host);
         tagRepository.save(tag);
     }
@@ -107,6 +108,7 @@ public class TagServiceImpl implements TagService{
          *  [체크리스트]
          * 1. latitude 범위 조건 확인
          * 2. longitude 범위 조건 확인
+         * 3. DeadLine 을 넘은 tag 는 삭제한다.
          *
          * [과정]
          * 1. memberId 로 조회자을 찾는다.
@@ -116,29 +118,42 @@ public class TagServiceImpl implements TagService{
 
         // [체크리스트 1]
         if(!tagValidator.checkLatitude(latitude))
-            throw new InvalidRangeException("latitude","위도는 북위 33.11 이상, 북위 38.61 이하여야 합니다.");
+            throw new CustomInvalidValueException("latitude","위도는 북위 33.11 이상, 북위 38.61 이하여야 합니다.");
         // [체크리스트 2]
         if(!tagValidator.checkLongitude(longitude))
-            throw new InvalidRangeException("longitude","경도는 동경 124.60 이상, 동경 131.87 이하여야 합니다.");
+            throw new CustomInvalidValueException("longitude","경도는 동경 124.60 이상, 동경 131.87 이하여야 합니다.");
 
         // [과정 1]
         Member member = memberRepository.findById(memberId);
 
         // [전제조건 1]
         if(!commonValidator.found(member))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 1-1]
         if(!memberValidator.checkRole(member.getRole(), Role.VIEWER))
-            throw new InvalidStateException("memberId","Tag 를 게시 할 수 있는 역할이 아닙니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 게시 할 수 있는 역할이 아닙니다.");
         // [전제조건 1-2]
         if(commonValidator.found(member.getTag())) // 없어야 한다.
-            throw new InvalidStateException("memberId","Tag 를 게시하거나 구독 중인 사용자입니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 게시하거나 구독 중인 사용자입니다.");
 
         // [과정 2]
         Gender gender = member.getGender();
         Integer age = DateTimeParse.calculateAge(member.getBirthday());
         // [과정 3]
         List<Tag> findTags = tagRepository.findByCriteria(latitude, longitude, age, gender);
+
+        // [체크리스트 3]
+        LocalDateTime now = LocalDateTime.now();
+        Iterator<Tag> iterator = findTags.iterator();
+        while (iterator.hasNext()) {
+            Tag findTag = iterator.next();
+            if (!tagValidator.checkDeadLine(now, findTag.getDeletedAt())) {
+                removeMappingConnections(findTag);
+                tagRepository.delete(findTag);
+                iterator.remove(); // 리스트에서 해당 태그를 삭제
+            }
+        }
+
         return findTags;
     }
 
@@ -148,6 +163,7 @@ public class TagServiceImpl implements TagService{
          * [전제조건]
          * 1. 유효한 Tag 인지 확인
          *      1-1. Db에 저장되어 있나?
+         * 2. DeadLine 준수하였는지?
          *
          * [과정]
          * 1. tagId로 tag 을 찾는다.
@@ -160,7 +176,14 @@ public class TagServiceImpl implements TagService{
 
         // [전제조건 1-1]
         if(!commonValidator.found(tag))
-            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+            throw new CustomInvalidValueException("tagId","Tag 가 식별되지 않습니다.");
+        // [전제조건 2]
+        if(!tagValidator.checkDeadLine(LocalDateTime.now(),tag.getDeletedAt())) {
+            // 유효기간이 지난 Tag는 삭제하고, 클라이언트에게 삭되었다고 반환.
+            removeMappingConnections(tag);
+            tagRepository.delete(tag);
+            throw new CustomInvalidValueException("tagId", "삭제된 Tag 입니다.");
+        }
 
         // [과정 2]
         List<Member> members = tag.getMembers();
@@ -211,16 +234,16 @@ public class TagServiceImpl implements TagService{
 
         // [전제조건 1-1]
         if(!commonValidator.found(tag))
-            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+            throw new CustomInvalidValueException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
         if(!commonValidator.found(member))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 2-2, 2-3]
         if(!memberValidator.checkRole(member.getRole(), Role.VIEWER))
-            throw new InvalidStateException("memberId","Tag 를 구독 할 수 있는 역할이 아닙니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 구독 할 수 있는 역할이 아닙니다.");
         // [전제조건 2-3]
         if(commonValidator.found(member.getTag())) //  있으면 안되는 거다.
-            throw new InvalidStateException("memberId","Tag 를 게시하거나 이미 구독 중인 사용자입니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 게시하거나 이미 구독 중인 사용자입니다.");
 
         // [과정 3]
         tag.addGuest(member);
@@ -256,16 +279,16 @@ public class TagServiceImpl implements TagService{
 
         // [전제조건 1-1]
         if(!commonValidator.found(tag))
-            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+            throw new CustomInvalidValueException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
         if(!commonValidator.found(member))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 2-2]
         if(!memberValidator.checkRole(member.getRole(), Role.GUEST))
-            throw new InvalidStateException("memberId","Tag 를 구독 해제 할 수 있는 역할이 아닙니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 구독 해제 할 수 있는 역할이 아닙니다.");
         // [전제조건 2-3]
         if(!commonValidator.found(member.getTag())) // 있어야한다.
-            throw new InvalidStateException("memberId","구독 해제 할 Tag 가 없습니다.");
+            throw new CustomInvalidValueException("memberId","구독 해제 할 Tag 가 없습니다.");
 
 
         // [과정 3]
@@ -304,22 +327,26 @@ public class TagServiceImpl implements TagService{
 
         // [전제조건 1-1]
         if(!commonValidator.found(tag))
-            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+            throw new CustomInvalidValueException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
         if(!commonValidator.found(member))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 2-2]
         if(!memberValidator.checkRole(member.getRole(), Role.HOST))
-            throw new InvalidStateException("memberId","Tag 를 삭제 할 수 있는 역할이 아닙니다.");
+            throw new CustomInvalidValueException("memberId","Tag 를 삭제 할 수 있는 역할이 아닙니다.");
         // [전제조건 2-3]
         if(!commonValidator.found(member.getTag())) // 있어야 한다.
-            throw new InvalidStateException("memberId","삭제 할 Tag 가 없습니다.");
+            throw new CustomInvalidValueException("memberId","삭제 할 Tag 가 없습니다.");
 
-        // [과정 3]
-        tag.removeAllMembers();
-        // [과정 4]
-        tag.removeAllChatrooms();
+        // [과정 3, 4]
+        removeMappingConnections(tag);
         // [과정 5]
         tagRepository.delete(tag);
+    }
+
+
+    public void removeMappingConnections(Tag tag){
+        tag.removeAllMembers();
+        tag.removeAllChatrooms();
     }
 }
