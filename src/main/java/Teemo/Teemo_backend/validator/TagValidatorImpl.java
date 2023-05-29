@@ -1,7 +1,6 @@
 package Teemo.Teemo_backend.validator;
 
 import Teemo.Teemo_backend.domain.Gender;
-import Teemo.Teemo_backend.domain.Tag;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,12 +44,12 @@ public class TagValidatorImpl implements TagValidator {
         return false;
     }
     @Override
-    public boolean checkUpperAge(int upperAge, int memberAge) { // (자신의 나이) 이상, 100 살 이하
+    public boolean compareUpperAge(Integer upperAge, Integer memberAge) { // (자신의 나이) 이상, 100 살 이하
         if(memberAge<=upperAge && upperAge <= MaxUpperAge ) return true;
         return false;
     }
     @Override
-    public boolean checkLowerAge(int lowerAge, int memberAge) { // 0 살 이상, (자신의 나이) 이하
+    public boolean compareLowerAge(Integer lowerAge, Integer memberAge) { // 0 살 이상, (자신의 나이) 이하
         if(MinLowerAge<=lowerAge && lowerAge <= memberAge ) return true;
         return false;
     }

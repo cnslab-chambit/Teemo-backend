@@ -78,10 +78,10 @@ public class TagServiceImpl implements TagService{
         if(!tagValidator.checkMaxNum(maxNum))
             throw new InvalidRangeException("maxNum","모집인원은 1에서 5 사이의 값이어야 합니다.");
         // [체크리스트 4]
-        if(!tagValidator.checkUpperAge(upperAge,DateTimeParse.calculateAge(host.getBirthday())))
+        if(!tagValidator.compareUpperAge(upperAge,DateTimeParse.calculateAge(host.getBirthday())))
             throw new InvalidRangeException("title","모집 나이대의 상한은 자신의 나이 이상, 100 이하여야 합니다.");
         // [체크리스트 5]
-        if(!tagValidator.checkLowerAge(lowerAge,DateTimeParse.calculateAge(host.getBirthday())))
+        if(!tagValidator.compareLowerAge(lowerAge,DateTimeParse.calculateAge(host.getBirthday())))
             throw new InvalidRangeException("title","모집 나이대의 하한은 0 이상, 자신의 나이 이하여야 합니다.");
         // [체크리스트 6]
         if(!tagValidator.checkLatitude(latitude))
