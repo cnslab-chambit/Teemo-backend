@@ -3,6 +3,9 @@ package Teemo.Teemo_backend.validator;
 import Teemo.Teemo_backend.domain.Gender;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Component
 public class TagValidatorImpl implements TagValidator {
     private final double MaxLatitude = 38.61;
@@ -19,43 +22,40 @@ public class TagValidatorImpl implements TagValidator {
 
     @Override
     public boolean checkLatitude(Double latitude){
-        if(MinLatitude<=latitude && latitude <= MaxLatitude) return true;
-        return false;
+        return (MinLatitude<=latitude && latitude <= MaxLatitude);
     }
     @Override
     public boolean checkLongitude(Double longitude){
-        if(MinLongitude<=longitude && longitude <= MaxLongitude) return true;
-        return false;
+        return (MinLongitude<=longitude && longitude <= MaxLongitude);
     }
     @Override
     public boolean checkTitleLength(Integer titleLength) {
-        if(MinTitleLength<=titleLength && titleLength<=MaxTitleLength)return true;
-        return false;
+        return (MinTitleLength<=titleLength && titleLength<=MaxTitleLength);
     }
     @Override
     public boolean checkDetailLength(Integer detailLength) {
-        if(detailLength==null) return true;
-        if(detailLength<=MaxDetailLength)return true;
-        return false;
+        return (detailLength==null||detailLength<=MaxDetailLength);
     }
     @Override
     public boolean checkMaxNum(Integer maxNum) {
-        if(MinMaxNum<=maxNum && maxNum<=MaxMaxNum) return true;
-        return false;
+        return (MinMaxNum<=maxNum && maxNum<=MaxMaxNum);
     }
     @Override
     public boolean compareUpperAge(Integer upperAge, Integer memberAge) { // (자신의 나이) 이상, 100 살 이하
-        if(memberAge<=upperAge && upperAge <= MaxUpperAge ) return true;
-        return false;
+        return (memberAge<=upperAge && upperAge <= MaxUpperAge );
     }
     @Override
     public boolean compareLowerAge(Integer lowerAge, Integer memberAge) { // 0 살 이상, (자신의 나이) 이하
-        if(MinLowerAge<=lowerAge && lowerAge <= memberAge ) return true;
-        return false;
+        return (MinLowerAge<=lowerAge && lowerAge <= memberAge );
     }
+
+    @Override
+    public boolean checkDeadLine(LocalDateTime now, LocalDateTime deletedAt) {
+        return now.isBefore(deletedAt);
+    }
+
     @Override
     public boolean checkTargetGender(Gender targetGender){
-        if(targetGender == Gender.M || targetGender == Gender.W ||targetGender == Gender.N ) return true;
-        return false;
+        return (targetGender == Gender.M || targetGender == Gender.W ||targetGender == Gender.N );
     }
 }
