@@ -3,6 +3,8 @@ package Teemo.Teemo_backend.controller;
 import Teemo.Teemo_backend.domain.Chat;
 import Teemo.Teemo_backend.domain.dtos.ChatroomCreateRequest;
 import Teemo.Teemo_backend.domain.dtos.ChatroomSearchResponse;
+import Teemo.Teemo_backend.error.CustomErrorResponse;
+import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.service.ChatroomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chatrooms")
 @RequiredArgsConstructor
-@Slf4j
 public class ChatroomControllerImpl {
     private final ChatroomService chatroomService;
 
@@ -27,11 +28,13 @@ public class ChatroomControllerImpl {
      */
     @PostMapping("/create")
     public ResponseEntity<ChatroomSearchResponse> createChatroom(@RequestBody ChatroomCreateRequest request){
-        log.info("memberId: "+request.getMemberId());
-        log.info("tatId: "+request.getTagId());
-        log.info("latitude: "+ request.getLatitude());
-        log.info("longitude: "+request.getLongitude());
-        ChatroomSearchResponse response = chatroomService.create(request);
+        ChatroomSearchResponse response = null;
+        try {
+            response = chatroomService.create(request);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -46,7 +49,13 @@ public class ChatroomControllerImpl {
             @RequestParam Long memberId,
             @RequestParam Long tagId
     ){
-        List<ChatroomSearchResponse> responses = chatroomService.search(memberId, tagId);
+        List<ChatroomSearchResponse> responses = null;
+        try {
+            responses = chatroomService.search(memberId, tagId);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(responses);
     }
 
@@ -58,7 +67,13 @@ public class ChatroomControllerImpl {
      */
     @GetMapping("/enter")
     public ResponseEntity<List<Chat>> enterChatroom(@RequestParam Long chatroomId){
-        List<Chat> response = chatroomService.load(chatroomId);
+        List<Chat> response = null;
+        try {
+            response =chatroomService.load(chatroomId);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -74,7 +89,12 @@ public class ChatroomControllerImpl {
             @PathVariable Long chatroomId
     )
     {
-        chatroomService.remove(memberId, chatroomId);
+        try {
+            chatroomService.remove(memberId, chatroomId);
+        }catch (CustomInvalidValueException e) {
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
