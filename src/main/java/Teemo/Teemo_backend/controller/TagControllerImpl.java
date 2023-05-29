@@ -2,8 +2,7 @@ package Teemo.Teemo_backend.controller;
 
 import Teemo.Teemo_backend.domain.Tag;
 import Teemo.Teemo_backend.domain.dtos.*;
-import Teemo.Teemo_backend.error.InvalidRangeException;
-import Teemo.Teemo_backend.error.InvalidStateException;
+import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.service.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +32,8 @@ public class TagControllerImpl {
         try {
             tagService.upload(request);
         }
-        catch (InvalidRangeException e){
+        catch (CustomInvalidValueException e){
             return getMapResponseEntity("InvalidRangeException",e.getField());
-        }catch (InvalidStateException e){
-            return getMapResponseEntity("InvalidStateException",e.getField());
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }

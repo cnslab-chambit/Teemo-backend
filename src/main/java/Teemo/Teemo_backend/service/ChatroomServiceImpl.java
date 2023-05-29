@@ -3,15 +3,13 @@ package Teemo.Teemo_backend.service;
 import Teemo.Teemo_backend.domain.*;
 import Teemo.Teemo_backend.domain.dtos.ChatroomCreateRequest;
 import Teemo.Teemo_backend.domain.dtos.ChatroomSearchResponse;
-import Teemo.Teemo_backend.error.InvalidRangeException;
-import Teemo.Teemo_backend.error.InvalidStateException;
+import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.repository.ChatroomRepository;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.repository.TagRepository;
 import Teemo.Teemo_backend.util.DateTimeParse;
 import Teemo.Teemo_backend.validator.CommonValidator;
 import Teemo.Teemo_backend.validator.MemberValidator;
-import Teemo.Teemo_backend.validator.TagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,22 +62,22 @@ public class ChatroomServiceImpl implements ChatroomService{
 
         // [전제조건 1-1]
         if(!commonValidator.found(tag))
-            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+            throw new CustomInvalidValueException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
         if(!commonValidator.found(guest))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
         // [전제조건 2-2]
         if(!memberValidator.checkRole(guest.getRole(), Role.GUEST))
-            throw new InvalidStateException("memberId","Chatroom 을 생성 할 수 있는 역할이 아닙니다.");
+            throw new CustomInvalidValueException("memberId","Chatroom 을 생성 할 수 있는 역할이 아닙니다.");
         // [전제조건 2-3]
         if(!commonValidator.found(guest.getTag())) // 없으면 안된다.
-            throw new InvalidStateException("memberId","Chatroom 을 생성 할 수 있는 상태가 아닙니다.");
+            throw new CustomInvalidValueException("memberId","Chatroom 을 생성 할 수 있는 상태가 아닙니다.");
         // [전제조건 3-1]
         if( Math.abs(tag.getLatitude() - latitude) > 0.0045 )
-            throw new InvalidRangeException("latitude","Tag 의 위치로부터 500m 외각에 있습니다.");
+            throw new CustomInvalidValueException("latitude","Tag 의 위치로부터 500m 외각에 있습니다.");
         // [전제조건 3-2]
         if( Math.abs(tag.getLongitude() - longitude) > 0.006 )
-            throw new InvalidRangeException("longitude","Tag 의 위치로부터 500m 외각에 있습니다.");
+            throw new CustomInvalidValueException("longitude","Tag 의 위치로부터 500m 외각에 있습니다.");
 
         // [과정 3]
         Chatroom chatroom = Chatroom.createChatroom(guest,tag);
@@ -127,10 +125,10 @@ public class ChatroomServiceImpl implements ChatroomService{
 
         // [전제조건 1-1]
         if(!commonValidator.found(tag))
-            throw new InvalidStateException("tagId","Tag 가 식별되지 않습니다.");
+            throw new CustomInvalidValueException("tagId","Tag 가 식별되지 않습니다.");
         // [전제조건 2-1]
         if(!commonValidator.found(member))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
 
         if(member.getRole() == Role.HOST){ // 조회자가 Host 라면
             List<Chatroom> chatrooms = tag.getChatrooms();
@@ -170,7 +168,7 @@ public class ChatroomServiceImpl implements ChatroomService{
          */
         Chatroom chatroom = chatroomRepository.findById(chatroomId);
         if(commonValidator.found(chatroom))
-            throw new InvalidStateException("chatroomId","채팅방 이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("chatroomId","채팅방 이 식별되지 않습니다.");
         List<Chat> response = chatroom.getChats();
         return response;
     }
@@ -200,9 +198,9 @@ public class ChatroomServiceImpl implements ChatroomService{
         Chatroom chatroom = chatroomRepository.findById(chatroomId);
 
         if(commonValidator.found(member))
-            throw new InvalidStateException("memberId","회원이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
         if(commonValidator.found(chatroom))
-            throw new InvalidStateException("chatroomId","채팅방 이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("chatroomId","채팅방 이 식별되지 않습니다.");
 
         //[과정 3]
         chatroom.removeGuest();
