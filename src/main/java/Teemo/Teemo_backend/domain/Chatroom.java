@@ -69,4 +69,8 @@ public class Chatroom {
         Chatroom chatroom = (Chatroom)o;
         return (this.id).equals(chatroom.getId());
     }
+
+    public void addChats(Chat chat){
+        this.chats.add(chat);
+    }
 }
