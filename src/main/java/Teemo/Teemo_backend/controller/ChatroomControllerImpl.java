@@ -65,8 +65,8 @@ public class ChatroomControllerImpl {
      * @input   : chatroomId
      * @output  : [{chatId, nickname, msg} , ... , {chatId, nickname, msg}]
      */
-    @GetMapping("/enter")
-    public ResponseEntity<List<Chat>> enterChatroom(@RequestParam Long chatroomId){
+    @GetMapping("/enter/{chatroomId}")
+    public ResponseEntity<List<Chat>> enterChatroom(@PathVariable Long chatroomId){
         List<Chat> response = null;
         try {
             response =chatroomService.load(chatroomId);
