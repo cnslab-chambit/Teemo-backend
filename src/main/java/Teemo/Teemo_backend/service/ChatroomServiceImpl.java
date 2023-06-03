@@ -167,7 +167,7 @@ public class ChatroomServiceImpl implements ChatroomService{
          * 1. 유효한 채팅방 인지 확인
          */
         Chatroom chatroom = chatroomRepository.findById(chatroomId);
-        if(commonValidator.found(chatroom))
+        if(!commonValidator.found(chatroom))
             throw new CustomInvalidValueException("chatroomId","채팅방 이 식별되지 않습니다.");
         List<Chat> response = chatroom.getChats();
         return response;
@@ -197,9 +197,9 @@ public class ChatroomServiceImpl implements ChatroomService{
         //[과정 2]
         Chatroom chatroom = chatroomRepository.findById(chatroomId);
 
-        if(commonValidator.found(member))
+        if(!commonValidator.found(member))
             throw new CustomInvalidValueException("memberId","회원이 식별되지 않습니다.");
-        if(commonValidator.found(chatroom))
+        if(!commonValidator.found(chatroom))
             throw new CustomInvalidValueException("chatroomId","채팅방 이 식별되지 않습니다.");
 
         //[과정 3]
