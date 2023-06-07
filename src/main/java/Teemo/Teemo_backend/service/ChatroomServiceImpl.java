@@ -168,7 +168,7 @@ public class ChatroomServiceImpl implements ChatroomService{
          */
         Chatroom chatroom = chatroomRepository.findById(chatroomId);
         if(!commonValidator.found(chatroom))
-            throw new CustomInvalidValueException("chatroomId","채팅방 이 식별되지 않습니다.");
+            throw new CustomInvalidValueException("chatroomId", "채팅방 이 식별되지 않습니다.");
         List<Chat> response = chatroom.getChats();
         return response;
     }
