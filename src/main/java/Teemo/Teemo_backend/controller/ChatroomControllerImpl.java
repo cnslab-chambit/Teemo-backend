@@ -2,16 +2,17 @@ package Teemo.Teemo_backend.controller;
 
 import Teemo.Teemo_backend.domain.Chat;
 import Teemo.Teemo_backend.domain.dtos.ChatroomCreateRequest;
+import Teemo.Teemo_backend.domain.dtos.ChatroomEnterResponse;
 import Teemo.Teemo_backend.domain.dtos.ChatroomSearchResponse;
 import Teemo.Teemo_backend.error.CustomErrorResponse;
 import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.service.ChatroomService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -66,15 +67,19 @@ public class ChatroomControllerImpl {
      * @output  : [{chatId, nickname, msg} , ... , {chatId, nickname, msg}]
      */
     @GetMapping("/enter/{chatroomId}")
-    public ResponseEntity<List<Chat>> enterChatroom(@PathVariable Long chatroomId){
-        List<Chat> response = null;
+    public ResponseEntity<List<ChatroomEnterResponse>> enterChatroom(@PathVariable Long chatroomId){
+        List<Chat> chats = null;
         try {
-            response =chatroomService.load(chatroomId);
+            chats =chatroomService.load(chatroomId);
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(response);
+        List<ChatroomEnterResponse> responses = new ArrayList<>();
+        for (Chat chat : chats) {
+            responses.add(new ChatroomEnterResponse(chat.getId(),chat.getMsg(),chat.getSender()));
+        }
+        return ResponseEntity.ok(responses);
     }
 
     /**
