@@ -98,14 +98,14 @@ public class MemberControllerImpl implements MemberController{
             log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }log.info("정상 응답");
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
      * 회원 접속 (로그인)
      */
     @PostMapping("/login")
-    public ResponseEntity<MemberLoginResponse> login(MemberLoginRequest request){
+    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request){
         log.info("회원 접속");
         Member member = null;
         try{
