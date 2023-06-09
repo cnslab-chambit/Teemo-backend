@@ -58,6 +58,7 @@ public class Chatroom {
 
     public void removeGuest(){ // Member(guest) 객체에서 이 Chatroom 객체 삭제 + 이 Chatroom 에서도 게스트와의 연관관계 해제
         this.guest.unsetChatroom();
+        this.guest.unsetTag(); // Guest 의 Tag 와의 연관을 끊는다.
         this.guest = null;
     }
     public void unsetTag(){ // Tag 와의 연관관계 해제
