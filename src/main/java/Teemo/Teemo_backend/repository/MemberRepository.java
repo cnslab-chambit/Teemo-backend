@@ -7,5 +7,6 @@ public interface MemberRepository {
     Member findById(Long id); // id 로 검색
     Member findByEmail(String email);
     Member findByNickname(String nickname); // 닉네임으로 검색
+    Member findByEmailOrNickname(String email, String nickname);
     void delete(Member member); // 삭제
 }

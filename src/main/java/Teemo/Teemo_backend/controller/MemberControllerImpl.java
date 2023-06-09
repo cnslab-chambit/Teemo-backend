@@ -7,6 +7,7 @@ import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.repository.MemberRepository;
 import Teemo.Teemo_backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberControllerImpl implements MemberController{
     private final MemberRepository memberRepository;
     private final MemberService memberService;
@@ -24,13 +26,17 @@ public class MemberControllerImpl implements MemberController{
     @PostMapping("/signup")
 //    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity signup(@RequestBody MemberSignupRequest request)
-    {   try {
+    {
+        log.info("회원 생성");
+        try {
             memberService.join(request);
         }
         catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
+        log.info("정상 응답");
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
@@ -40,23 +46,25 @@ public class MemberControllerImpl implements MemberController{
      */
     @GetMapping("/find")
     public ResponseEntity<MemberFindResponse> findMember(@RequestParam Long memberId){
+        log.info("자기 정보 조회");
         Member member = null;
         try{
             member = memberService.find(memberId);
         }
         catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
         MemberFindResponse response = new MemberFindResponse(
                 member.getEmail(),
-                member.getPassword(),
                 member.getNickname(),
                 member.getBirthday(),
                 member.getGender(),
                 member.getCreatedAt(),
                 member.getDeletedAt()
         );
+        log.info("정상 응답");
         return ResponseEntity.ok(response);
     }
 
@@ -65,12 +73,15 @@ public class MemberControllerImpl implements MemberController{
      */
     @PutMapping("/update")
     public ResponseEntity updateMember(@RequestBody MemberUpdateRequest request){
+        log.info("회원 정보 수정");
         try {
             memberService.update(request);
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
+        log.info("정상 응답");
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -79,20 +90,23 @@ public class MemberControllerImpl implements MemberController{
      */
     @DeleteMapping("/withdrawal/{memberId}")
     public ResponseEntity deleteMember(@PathVariable Long memberId){
+        log.info("회원 탈퇴");
         try {
             memberService.remove(memberId);
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(HttpStatus.OK);
+        }log.info("정상 응답");
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     /**
      * 회원 접속 (로그인)
      */
     @PostMapping("/login")
-    public ResponseEntity<MemberLoginResponse> login(MemberLoginRequest request){
+    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request){
+        log.info("회원 접속");
         Member member = null;
         try{
             member = memberService.login(request);
@@ -101,6 +115,7 @@ public class MemberControllerImpl implements MemberController{
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
         MemberLoginResponse response = new MemberLoginResponse(member.getId(),member.getRole());
+        log.info("정상 응답");
         return ResponseEntity.ok(response);
     }
 
@@ -109,12 +124,15 @@ public class MemberControllerImpl implements MemberController{
      */
     @GetMapping("/logout/{memberId}")
     public ResponseEntity logout(@PathVariable Long memberId){
+        log.info("회원 접속해제");
         try {
             memberService.logout(memberId);
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
+        log.info("정상 응답");
         return new ResponseEntity(HttpStatus.OK);
     }
 

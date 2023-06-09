@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @Getter
 public class MemberFindResponse {
     private String email;
-    private String password;
     private String nickname;
     private LocalDate birthday;
     private Gender gender;
@@ -19,7 +18,6 @@ public class MemberFindResponse {
 
     public MemberFindResponse(
             String email,
-            String password,
             String nickname,
             LocalDate birthday,
             Gender gender,
@@ -27,7 +25,6 @@ public class MemberFindResponse {
             LocalDate deletedAt
     ){
         this.email = email;
-        this.password = password;
         this.nickname = nickname;
         this.birthday = birthday;
         this.gender = gender;

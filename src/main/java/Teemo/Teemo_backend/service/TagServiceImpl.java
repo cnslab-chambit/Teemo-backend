@@ -31,7 +31,7 @@ public class TagServiceImpl implements TagService{
     private final MemberRepository memberRepository;
     @Override
     @Transactional
-    public void upload(TagCreateRequest request) {
+    public Tag upload(TagCreateRequest request) {
         /**
          * [전제조건]
          * 1. 유효한 사용자인지 확인
@@ -80,10 +80,10 @@ public class TagServiceImpl implements TagService{
             throw new CustomInvalidValueException("maxNum","모집인원은 1에서 5 사이의 값이어야 합니다.");
         // [체크리스트 4]
         if(!tagValidator.compareUpperAge(upperAge,DateTimeParse.calculateAge(host.getBirthday())))
-            throw new CustomInvalidValueException("title","모집 나이대의 상한은 자신의 나이 이상, 100 이하여야 합니다.");
+            throw new CustomInvalidValueException("upperAge","모집 나이대의 상한은 자신의 나이 이상, 100 이하여야 합니다.");
         // [체크리스트 5]
         if(!tagValidator.compareLowerAge(lowerAge,DateTimeParse.calculateAge(host.getBirthday())))
-            throw new CustomInvalidValueException("title","모집 나이대의 하한은 0 이상, 자신의 나이 이하여야 합니다.");
+            throw new CustomInvalidValueException("lowerAge","모집 나이대의 하한은 0 이상, 자신의 나이 이하여야 합니다.");
         // [체크리스트 6]
         if(!tagValidator.checkLatitude(latitude))
             throw new CustomInvalidValueException("latitude","위도는 북위 33.11 이상, 북위 38.61 이하여야 합니다.");
@@ -95,6 +95,8 @@ public class TagServiceImpl implements TagService{
             throw new CustomInvalidValueException("targetGender","모집성별이 적절하지 않습니다.");
         Tag tag = new Tag(title,detail,maxNum,targetGender,upperAge,lowerAge,latitude,longitude,host);
         tagRepository.save(tag);
+
+        return tag;
     }
 
     @Override

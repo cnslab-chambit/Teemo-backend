@@ -8,17 +8,17 @@ import java.time.LocalDateTime;
 
 @Component
 public class TagValidatorImpl implements TagValidator {
-    private final double MaxLatitude = 38.61;
-    private final double MinLatitude = 33.11;
-    private final double MaxLongitude = 131.87;
-    private final double MinLongitude = 124.60;
-    private final int MaxTitleLength = 15;
-    private final int MinTitleLength = 1;
-    private final int MaxDetailLength = 40;
-    private final int MaxMaxNum = 5;
-    private final int MinMaxNum = 1;
-    private final int MaxUpperAge = 100;
-    private final int MinLowerAge = 0;
+    static final double MaxLatitude = 38.61;
+    static final double MinLatitude = 33.11;
+    static final double MaxLongitude = 131.87;
+    static final double MinLongitude = 124.60;
+    static final int MaxTitleLength = 15;
+    static final int MinTitleLength = 1;
+    static final int MaxDetailLength = 40;
+    static final int MaxMaxNum = 5;
+    static final int MinMaxNum = 1;
+    static final int MaxUpperAge = 100;
+    static final int MinLowerAge = 0;
 
     @Override
     public boolean checkLatitude(Double latitude){

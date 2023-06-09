@@ -68,6 +68,7 @@ public class Member {
         this.tag = tag;
     }
     public void unsetTag(){
+        this.role = Role.VIEWER;
         this.tag = null;
     }
     public void setRole(Role role){

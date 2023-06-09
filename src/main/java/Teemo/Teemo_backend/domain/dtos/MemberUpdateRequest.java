@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class MemberUpdateRequest {
     @NotNull
-    private Long id;
+    private Long memberId;
     @NotNull
     private String email;
     @NotNull

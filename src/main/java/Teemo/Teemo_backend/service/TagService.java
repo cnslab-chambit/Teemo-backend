@@ -6,7 +6,7 @@ import Teemo.Teemo_backend.domain.dtos.*;
 import java.util.List;
 
 public interface TagService {
-    void upload(TagCreateRequest request); // 태그 업로드
+    Tag upload(TagCreateRequest request); // 태그 업로드
     List<Tag> search(Long memberId, Double latitude, Double longitude); // 주변 태그 검색
     TagFindResponse find(Long tagId); // 특정 태그 정보 검색
     TagSubscribeResponse subscribe(Long memberId, Long tagId); // 특정 태그 구독
