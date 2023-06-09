@@ -190,7 +190,6 @@ public class ChatroomServiceImpl implements ChatroomService{
          * 3. Chatroom 에 저장된 Guest 객체에 접근하여 Chatroom 과의 매핑을 끊는다.
          * 4. Chatroom 에 저장된 Tag 객체 접근하여 Chatroom 과의 매핑을 끊는다.
          * 5. Chatroom 을 db 상에서 삭제한다.
-         *
          */
         //[과정 1]
         Member member = memberRepository.findById(memberId);
