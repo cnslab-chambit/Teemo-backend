@@ -50,7 +50,6 @@ public class MemberControllerImpl implements MemberController{
         }
         MemberFindResponse response = new MemberFindResponse(
                 member.getEmail(),
-                member.getPassword(),
                 member.getNickname(),
                 member.getBirthday(),
                 member.getGender(),

@@ -7,6 +7,7 @@ import Teemo.Teemo_backend.error.CustomInvalidValueException;
 import Teemo.Teemo_backend.service.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/tags")
 @RequiredArgsConstructor
+@Slf4j
 public class TagControllerImpl {
     private final TagService tagService;
     /**
@@ -29,14 +31,15 @@ public class TagControllerImpl {
      */
     @PostMapping("/upload")
     public ResponseEntity createTag(@Valid @RequestBody TagCreateRequest request){
+        log.info("태그 생성");
         // service 계층 : 입력 데이터의 유효성 검사
         try {
             tagService.upload(request);
         }
         catch (CustomInvalidValueException e) {
-            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+        }log.info("정상 응답");
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
@@ -53,17 +56,19 @@ public class TagControllerImpl {
             @RequestParam("longitude") Double longitude
     )
     {
+        log.info("주변 태그 검색");
         List<Tag> list = null;
         try {
             list = tagService.search(memberId, latitude, longitude);
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
         List<TagSearchResponse> responses = new ArrayList<>();
         for(Tag tag: list){
             responses.add(new TagSearchResponse(tag.getId(),tag.getLatitude(),tag.getLongitude()));
-        }
+        }log.info("정상 응답");
         return ResponseEntity.ok(responses);
     }
 
@@ -76,13 +81,15 @@ public class TagControllerImpl {
     @GetMapping("/find/{tagId}")
     public ResponseEntity<TagFindResponse> findTag(@PathVariable Long tagId)
     {
+        log.info("특정 태그 정보 검색");
         TagFindResponse response = null;
         try{
             response = tagService.find(tagId);
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+        }log.info("정상 응답");
         return ResponseEntity.ok(response);
     }
 
@@ -95,13 +102,15 @@ public class TagControllerImpl {
      */
     @PostMapping("/subscribe")
     public ResponseEntity<TagSubscribeResponse> subscribeTag(@RequestBody TagCommonRequest request){
+        log.info("특정 태그 구독");
         TagSubscribeResponse response = null;
         try {
             response = tagService.subscribe(request.getMemberId(), request.getTagId());
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+        }log.info("정상 응답");
         return ResponseEntity.ok(response);
     }
 
@@ -113,12 +122,14 @@ public class TagControllerImpl {
      */
     @PostMapping("/unsubscribe")
     public ResponseEntity unsubscribeTag(@RequestBody TagCommonRequest request){
+        log.info("특정 태그 구독 취소");
         try {
             tagService.unsubscribe(request.getMemberId(), request.getTagId());
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+        }log.info("정상 응답");
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -130,12 +141,15 @@ public class TagControllerImpl {
      */
     @DeleteMapping("/delete")
     public ResponseEntity deleteTag(@RequestBody TagCommonRequest request){
+        log.info("태그 삭제");
         try {
             tagService.remove(request.getMemberId(), request.getTagId());
         }catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());
+            log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
         }
+        log.info("정상 응답");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
