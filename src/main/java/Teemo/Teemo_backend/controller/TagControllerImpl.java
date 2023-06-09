@@ -28,17 +28,20 @@ public class TagControllerImpl {
      * @output  : 201 CREATED
      */
     @PostMapping("/upload")
-    public ResponseEntity createTag(@Valid @RequestBody TagCreateRequest request){
+    public ResponseEntity<TagCreateResponse> createTag(@Valid @RequestBody TagCreateRequest request){
         log.info("태그 생성");
+        Tag tag = null;
         // service 계층 : 입력 데이터의 유효성 검사
         try {
-            tagService.upload(request);
+            tag = tagService.upload(request);
         }
         catch (CustomInvalidValueException e) {
             CustomErrorResponse errorResponse = new CustomErrorResponse(e.getField(), e.getMessage());log.info("비정상 응답");
             return new ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST);
-        }log.info("정상 응답");
-        return new ResponseEntity(HttpStatus.CREATED);
+        }
+        TagCreateResponse response = new TagCreateResponse(tag.getId(),tag.getCreatedAt(),tag.getDeletedAt());
+        log.info("정상 응답");
+        return ResponseEntity.ok(response);
     }
 
     /**
