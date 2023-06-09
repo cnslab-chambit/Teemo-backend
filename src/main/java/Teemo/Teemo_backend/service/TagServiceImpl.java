@@ -31,7 +31,7 @@ public class TagServiceImpl implements TagService{
     private final MemberRepository memberRepository;
     @Override
     @Transactional
-    public void upload(TagCreateRequest request) {
+    public Tag upload(TagCreateRequest request) {
         /**
          * [전제조건]
          * 1. 유효한 사용자인지 확인
@@ -95,6 +95,8 @@ public class TagServiceImpl implements TagService{
             throw new CustomInvalidValueException("targetGender","모집성별이 적절하지 않습니다.");
         Tag tag = new Tag(title,detail,maxNum,targetGender,upperAge,lowerAge,latitude,longitude,host);
         tagRepository.save(tag);
+
+        return tag;
     }
 
     @Override
