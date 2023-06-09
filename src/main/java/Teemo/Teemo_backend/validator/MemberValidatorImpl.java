@@ -14,7 +14,7 @@ public class MemberValidatorImpl implements MemberValidator{
 
     @Override
     public boolean checkNicknameLength(String nickname){
-        return MinNicknameLength<=nickname.length()&&MaxNicknameLength<=nickname.length();
+        return MinNicknameLength<=nickname.length()&&nickname.length()<=MaxNicknameLength;
     }
     @Override
     public boolean checkEmailLength(String email) {
