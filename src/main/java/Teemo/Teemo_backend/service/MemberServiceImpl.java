@@ -161,6 +161,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void logout(Long memberId) {
         /**
          * [체크리스트]
